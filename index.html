@@ -6,91 +6,98 @@
     <title>李林阳 Lilinyang | Portfolio 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<style>
-    /* 1. 全局滚动条美化 */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #020617; }
-    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+    <style>
+        /* --- 1. 基础设置 --- */
+        body { background-color: #020617; color: #e2e8f0; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
 
-    /* 2. 玻璃拟态导航栏 */
-    .glass-nav { 
-        background: rgba(2, 6, 23, 0.7); 
-        backdrop-filter: blur(12px); 
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
+        /* --- 2. 玻璃导航栏 --- */
+        .glass-nav { 
+            background: rgba(2, 6, 23, 0.7); 
+            backdrop-filter: blur(12px); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-    /* 3. 液态玻璃按钮 (Liquid Glass Button) */
-    .btn-liquid {
-        position: relative;
-        overflow: hidden;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.5s ease;
-        z-index: 1;
-    }
-    .btn-liquid::before {
-        content: "";
-        position: absolute;
-        top: 0; left: -100%; width: 100%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s ease;
-        z-index: -1;
-    }
-    .btn-liquid:hover {
-        border-color: rgba(59, 130, 246, 0.5);
-        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-        transform: translateY(-2px);
-    }
-    .btn-liquid:hover::before {
-        left: 100%;
-    }
+        /* --- 3. 液态玻璃按钮 --- */
+        .btn-liquid {
+            position: relative; overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease; z-index: 1;
+        }
+        .btn-liquid::before {
+            content: ""; position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease; z-index: -1;
+        }
+        .btn-liquid:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-liquid:hover::before { left: 100%; }
 
-    /* 4. 回到顶部按钮 */
-    #back-to-top {
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(20px);
-        transition: all 0.4s ease;
-    }
-    #back-to-top.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
+        /* --- 4. 回到顶部按钮 --- */
+        #back-to-top {
+            opacity: 0; visibility: hidden;
+            transform: translateY(20px); transition: all 0.4s ease;
+        }
+        #back-to-top.show {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
 
-    /* 5. 中英文切换逻辑 */
-    /* 默认显示 CN，隐藏 EN */
-    [lang="en"] { display: none; }
-    /* 当 body 有 .english-mode 类时，隐藏 CN，显示 EN */
-    body.english-mode [lang="cn"] { display: none; }
-    body.english-mode [lang="en"] { display: inline-block; }
-    
-    /* 粒子画布层级 */
-    #particle-canvas {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        z-index: 0;
-        pointer-events: none; /* 让鼠标能穿过画布点击按钮 */
-    }
-</style>
+        /* --- 5. 中英文切换 --- */
+        [lang="en"] { display: none; }
+        body.english-mode [lang="cn"] { display: none; }
+        body.english-mode [lang="en"] { display: inline-block; }
+
+        /* --- 6. 极光流光背景动画 (Aurora Gradient) --- */
+        .aurora-bg {
+            position: absolute; inset: 0; overflow: hidden; z-index: 0;
+            background: #020617;
+        }
+        .blob {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.5;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+        .blob-1 {
+            top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: #3b82f6; /* 蓝色 */
+            animation-delay: 0s;
+        }
+        .blob-2 {
+            bottom: -10%; right: -10%; width: 60vw; height: 60vw;
+            background: #7c3aed; /* 紫色 */
+            animation-delay: -5s;
+        }
+        .blob-3 {
+            top: 40%; left: 40%; width: 40vw; height: 40vw;
+            background: #be185d; /* 粉红 */
+            opacity: 0.3;
+            animation-duration: 15s;
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-200 font-sans antialiased selection:bg-blue-500 selection:text-white">
-<nav class="fixed w-full z-50 glass-nav transition-all duration-300">
+<body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
+
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="text-2xl font-bold tracking-tighter text-white relative z-50">Lilinyang.</a>
             
             <div class="flex items-center gap-6">
                 <div class="hidden md:flex space-x-8 text-sm font-medium">
-                    <a href="#about" class="hover:text-blue-400 transition text-slate-300">
-                        <span lang="cn">关于</span><span lang="en">About</span>
-                    </a>
-                    <a href="#uiux" class="hover:text-blue-400 transition text-slate-300">
-                        <span lang="cn">作品</span><span lang="en">Works</span>
-                    </a>
-                    <a href="#contact" class="hover:text-blue-400 transition text-slate-300">
-                        <span lang="cn">联系</span><span lang="en">Contact</span>
-                    </a>
+                    <a href="#about" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">关于</span><span lang="en">About</span></a>
+                    <a href="#uiux" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">作品</span><span lang="en">Works</span></a>
+                    <a href="#contact" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">联系</span><span lang="en">Contact</span></a>
                 </div>
                 <button onclick="toggleLanguage()" class="text-xs font-bold border border-slate-600 px-3 py-1 rounded-full text-slate-400 hover:text-white hover:border-white transition uppercase">
                     <span id="lang-btn-text">EN</span>
@@ -99,20 +106,21 @@
         </div>
     </nav>
 
-    <section id="about" class="h-screen flex items-center justify-center relative overflow-hidden bg-slate-950">
+    <section id="about" class="h-screen flex items-center justify-center relative overflow-hidden bg-slate-950 pb-32">
         
-        <canvas id="particle-canvas"></canvas>
-        
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-900/20 rounded-full blur-[100px] animate-pulse"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-900/20 rounded-full blur-[100px] animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="aurora-bg">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
 
         <div class="container mx-auto px-6 relative z-10 text-center">
             <div data-aos="fade-up" data-aos-duration="1000">
-                <p class="text-blue-500 font-medium mb-6 tracking-[0.2em] uppercase text-sm">
+                <p class="text-blue-400 font-medium mb-6 tracking-[0.3em] uppercase text-sm">
                     <span lang="cn">2026 个人作品集</span><span lang="en">Portfolio 2026</span>
                 </p>
                 
-                <h1 class="text-5xl md:text-8xl font-bold leading-tight mb-8 text-white">
+                <h1 class="text-5xl md:text-8xl font-bold leading-tight mb-8 text-white drop-shadow-lg">
                     <span lang="cn">品牌 · 产品 · 新媒体</span>
                     <span lang="en">Brand · Product · New Media</span>
                     <br>
@@ -121,28 +129,27 @@
                     </span>
                 </h1>
                 
-                <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                <p class="text-lg md:text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
                     <span lang="cn">澳门科技大学硕士在读。专注于品牌重塑与 AIGC 视觉探索，致力于创造具有商业价值与艺术温度的数字体验。</span>
                     <span lang="en">Master's student at M.U.S.T. Focusing on brand reshaping and AIGC visual exploration. Creating digital experiences with commercial value.</span>
                 </p>
                 
-                <div class="flex flex-col md:flex-row justify-center items-center mt-8">
-    <a href="#uiux" class="btn-liquid px-12 py-4 rounded-full text-white font-bold tracking-wide shadow-[0_0_20px_rgba(59,130,246,0.6)] hover:scale-105 transform transition">
-        <span lang="cn">查看作品</span><span lang="en">View Works</span>
-    </a>
-</div>
+                <div class="flex justify-center items-center">
+                    <a href="#uiux" class="btn-liquid px-12 py-4 rounded-full text-white font-bold tracking-wide shadow-[0_0_20px_rgba(59,130,246,0.6)] hover:scale-105 transform transition">
+                        <span lang="cn">查看作品</span><span lang="en">View Works</span>
+                    </a>
+                </div>
+            </div>
+        </div>
         
-    </div> <div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-500 animate-bounce z-20 pointer-events-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-        </svg>
-    </div>
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-slate-500 animate-bounce z-20 pointer-events-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
     </section>
 
-    <button id="back-to-top" onclick="scrollToTop()" class="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-600/40 transition group">
-        <svg class="w-6 h-6 group-hover:-translate-y-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-    </button>
-    <section id="uiux" class="py-20 bg-slate-900">
+    <section id="uiux" class="py-20 bg-slate-950 relative z-10">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-slate-800 pb-8">
                 <div data-aos="fade-up">
@@ -153,46 +160,70 @@
 
             <div class="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
                 
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-800 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-video w-full overflow-hidden">
-                        <img src="https://via.placeholder.com/800x600/0f172a/3b82f6?text=MAISC+Supercomputing" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 group-hover:rotate-1">
+                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300" data-aos="fade-up">
+                    <div class="w-full overflow-hidden bg-black">
+                        <img src="2.png" alt="MAISC Cover" class="w-full h-auto object-cover transition duration-700 group-hover:scale-105">
                     </div>
-                    <div class="p-6 relative z-10 bg-slate-800">
-                        <span class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-2 block">UI/UX Design</span>
-                        <h3 class="text-2xl font-bold text-white mb-2">澳门人工智能超算中心 MAISC</h3>
-                        <p class="text-slate-400 text-sm line-clamp-3">为 MAISC 打造的可信数据空间。以“莲花”与“运算”为核心理念，构建专业、清晰的视觉系统。包含 PC 与移动端双语交互设计。</p>
+                    <div class="p-6 relative z-10">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">UI/UX Design</span>
+                            <span class="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">Web / App</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">澳门人工智能超算中心 MAISC</h3>
+                        <p class="text-slate-400 text-sm line-clamp-3 mb-4">为 MAISC 打造的可信数据空间。包含 PC 端与移动端完整设计规范，融合莲花与运算概念。</p>
+                        <div class="flex gap-2 overflow-hidden">
+                            <img src="1.png" class="w-10 h-10 object-cover rounded border border-slate-600 opacity-60 group-hover:opacity-100 transition">
+                            <img src="3.png" class="w-10 h-10 object-cover rounded border border-slate-600 opacity-60 group-hover:opacity-100 transition">
+                            <img src="4.png" class="w-10 h-10 object-cover rounded border border-slate-600 opacity-60 group-hover:opacity-100 transition">
+                        </div>
                     </div>
                 </div>
 
-                <div id="branding" class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-800 cursor-pointer border border-slate-700/50" data-aos="fade-up" data-aos-delay="100">
-                    <div class="aspect-[4/5] w-full overflow-hidden">
+                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up" data-aos-delay="100">
+                    <div class="aspect-[4/5] w-full overflow-hidden bg-slate-800">
                         <img src="https://via.placeholder.com/600x750/fca5a5/991b1b?text=Macau+Kombucha" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                     </div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-6">
                         <h3 class="text-xl font-bold text-white">澳门康普茶 Packaging</h3>
-                        <p class="text-slate-300 text-sm">结合澳门地图纹样的本土茶饮包装</p>
+                        <p class="text-slate-300 text-sm">结合澳门地图纹样的本土茶饮包装设计。</p>
                     </div>
                 </div>
 
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-800 cursor-pointer border border-slate-700/50" data-aos="fade-up" data-aos-delay="200">
-                    <div class="aspect-square w-full overflow-hidden">
-                         <img src="https://via.placeholder.com/600x600/171717/e5e5e5?text=Power13+Energy" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
+                    <div class="aspect-video w-full overflow-hidden relative">
+                        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center group-hover:bg-blue-600 transition">
+                                <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                        </div>
+                        <img src="https://via.placeholder.com/800x450/3b82f6/ffffff?text=AI+Video+Project" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                     </div>
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-1 block">Commercial Visuals</span>
-                        <h3 class="text-xl font-bold text-white">Power13 运动饮料</h3>
-                        <p class="text-slate-400 text-sm mt-2">墨西哥“亡灵节”文化与运动元素的碰撞。</p>
+                    <div class="p-5">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1 block">AIGC Video</span>
+                        <h3 class="text-lg font-bold text-white">AI实验短片：三羊开泰</h3>
+                        <p class="text-slate-400 text-sm">全流程 AI 生成视频与音乐，探索传统文化的数字化表达。</p>
                     </div>
                 </div>
 
-                <div id="media" class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-gradient-to-br from-pink-600 to-rose-600 p-8 text-white cursor-pointer transform transition hover:-translate-y-2" data-aos="fade-up">
+                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
+                    <div class="aspect-[3/4] w-full overflow-hidden bg-slate-800">
+                        <img src="https://via.placeholder.com/600x800/b91c1c/fcd34d?text=Golden+Swallow" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                    </div>
+                    <div class="p-5">
+                        <span class="text-xs font-bold text-yellow-500 uppercase tracking-wider mb-1 block">Branding</span>
+                        <h3 class="text-lg font-bold text-white">金燕西洋牛油糕</h3>
+                        <p class="text-slate-400 text-sm mt-1">百年老字号品牌重塑，融合葡式花纹与澳门海洋文化。</p>
+                    </div>
+                </div>
+
+                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-gradient-to-br from-pink-600 to-rose-600 p-8 text-white cursor-pointer transform transition hover:-translate-y-2" data-aos="fade-up">
                     <div class="flex justify-between items-start mb-8">
                         <h3 class="text-2xl font-bold">新媒体运营<br>匠心荟澳</h3>
                         <span class="bg-white/20 px-3 py-1 rounded-full text-xs backdrop-blur-sm">Project</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <p class="text-4xl font-bold count-up" data-target="579">579</p>
+                            <p class="text-4xl font-bold">579</p>
                             <p class="text-sm opacity-80">粉丝增长</p>
                         </div>
                         <div>
@@ -203,28 +234,36 @@
                     <p class="mt-6 text-sm opacity-90 border-t border-white/20 pt-4">国家艺术基金2024项目官方账号从0到1搭建。</p>
                 </div>
 
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-800 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-[3/2] w-full overflow-hidden bg-white flex items-center justify-center">
-                        <img src="https://via.placeholder.com/600x400/ffffff/000000?text=SUSGRU+Logo" class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
+                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
+                    <div class="aspect-square w-full overflow-hidden bg-slate-800">
+                        <img src="https://via.placeholder.com/600x600/171717/e5e5e5?text=Power13+Energy" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                     </div>
-                    <div class="p-5">
-                        <h3 class="text-lg font-bold text-white">磐山鹤 SUSGRU</h3>
-                        <p class="text-slate-400 text-sm">户外运动品牌标识设计</p>
+                    <div class="p-6">
+                        <span class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-1 block">Visuals</span>
+                        <h3 class="text-xl font-bold text-white">Power13 运动饮料</h3>
+                        <p class="text-slate-400 text-sm mt-2">墨西哥“亡灵节”文化与运动元素的碰撞。</p>
                     </div>
                 </div>
-                 <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-800 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-video w-full overflow-hidden relative">
-                        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                            <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center group-hover:bg-blue-600 transition">
-                                <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                         <img src="https://via.placeholder.com/800x450/3b82f6/ffffff?text=AI+Video+Project" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+
+                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
+                    <div class="aspect-square w-full overflow-hidden bg-white">
+                        <img src="https://via.placeholder.com/600x600/ffffff/000000?text=MUST+Creative" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                     </div>
                     <div class="p-5">
-                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1 block">AIGC</span>
-                        <h3 class="text-lg font-bold text-white">AI实验短片：三羊开泰</h3>
-                        <p class="text-slate-400 text-sm">全流程 AI 生成视频与音乐。</p>
+                        <span class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1 block">Product</span>
+                        <h3 class="text-lg font-bold text-white">澳科大 25周年文创</h3>
+                        <p class="text-slate-400 text-sm mt-1">帆布袋、T恤与冰箱贴设计，全流程落地执行。</p>
+                    </div>
+                </div>
+
+                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
+                    <div class="aspect-square w-full overflow-hidden bg-slate-800">
+                        <img src="https://via.placeholder.com/600x600/14b8a6/ccfbf1?text=Fish+NFT" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                    </div>
+                    <div class="p-5">
+                        <span class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-1 block">Digital Art</span>
+                        <h3 class="text-lg font-bold text-white">鱼鱼鱼 NFT Collection</h3>
+                        <p class="text-slate-400 text-sm mt-1">120个数字藏品，隐喻元宇宙中的人间百态。</p>
                     </div>
                 </div>
 
@@ -250,128 +289,36 @@
         </div>
     </footer>
 
+    <button id="back-to-top" onclick="scrollToTop()" class="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-600/40 transition group">
+        <svg class="w-6 h-6 group-hover:-translate-y-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({
-            once: true, // 动画只播放一次
-            offset: 100, // 触发动画的偏移量
-            easing: 'ease-out-cubic',
-        });
-    </script>
-    <script>
-    // --- 1. 语言切换功能 ---
-    function toggleLanguage() {
-        const body = document.body;
-        const btnText = document.getElementById('lang-btn-text');
-        
-        // 切换 body 的 class
-        body.classList.toggle('english-mode');
-        
-        // 更新按钮文字
-        if (body.classList.contains('english-mode')) {
-            btnText.innerText = 'CN'; // 当前是英文，按钮显示“切回中文”
-        } else {
-            btnText.innerText = 'EN'; // 当前是中文，按钮显示“切去英文”
+        // 初始化动画
+        AOS.init({ once: true, offset: 100, easing: 'ease-out-cubic' });
+
+        // 语言切换
+        function toggleLanguage() {
+            const body = document.body;
+            const btnText = document.getElementById('lang-btn-text');
+            body.classList.toggle('english-mode');
+            btnText.innerText = body.classList.contains('english-mode') ? 'CN' : 'EN';
         }
-    }
 
-    // --- 2. 回到顶部功能 ---
-    const backToTopBtn = document.getElementById('back-to-top');
-    
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 300) {
-            backToTopBtn.classList.add('show');
-        } else {
-            backToTopBtn.classList.remove('show');
-        }
-    });
-
-    function scrollToTop() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // --- 3. 粒子特效 (Canvas Particle Network) ---
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-    let width, height;
-    let particles = [];
-
-    // 配置参数
-    const particleConfig = {
-        count: 60,            // 粒子数量
-        color: 'rgba(59, 130, 246, 0.5)', // 粒子颜色 (蓝色)
-        connectionDist: 150,  // 连线距离
-        speed: 0.5            // 运动速度
-    };
-
-    function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    }
-
-    class Particle {
-        constructor() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
-            this.vx = (Math.random() - 0.5) * particleConfig.speed;
-            this.vy = (Math.random() - 0.5) * particleConfig.speed;
-            this.size = Math.random() * 2 + 1;
-        }
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            // 碰到边界反弹
-            if (this.x < 0 || this.x > width) this.vx *= -1;
-            if (this.y < 0 || this.y > height) this.vy *= -1;
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = particleConfig.color;
-            ctx.fill();
-        }
-    }
-
-    function initParticles() {
-        particles = [];
-        for (let i = 0; i < particleConfig.count; i++) {
-            particles.push(new Particle());
-        }
-    }
-
-    function animateParticles() {
-        ctx.clearRect(0, 0, width, height);
-        
-        for (let i = 0; i < particles.length; i++) {
-            let p = particles[i];
-            p.update();
-            p.draw();
-
-            // 绘制连线
-            for (let j = i + 1; j < particles.length; j++) {
-                let p2 = particles[j];
-                let dx = p.x - p2.x;
-                let dy = p.y - p2.y;
-                let dist = Math.sqrt(dx*dx + dy*dy);
-
-                if (dist < particleConfig.connectionDist) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(100, 149, 237, ${1 - dist/particleConfig.connectionDist})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p2.x, p2.y);
-                    ctx.stroke();
-                }
+        // 回到顶部显示控制
+        const backToTopBtn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
             }
-        }
-        requestAnimationFrame(animateParticles);
-    }
+        });
 
-    // 初始化运行
-    window.addEventListener('resize', () => { resize(); initParticles(); });
-    resize();
-    initParticles();
-    animateParticles();
-</script>
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
 </html>
