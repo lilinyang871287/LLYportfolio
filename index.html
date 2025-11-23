@@ -110,6 +110,27 @@
             66% { transform: translate(-20vw, 20vh) scale(0.8) rotate(240deg); } /* 跑到左下方变小 */
             100% { transform: translate(0, 0) scale(0.5) rotate(360deg); } /* 回到原点 */
         }
+        /* --- 7. 鼠标交互光斑 (Interactive Blob) --- */
+        #interactive-blob {
+            position: absolute;
+            top: 0; left: 0;
+            width: 20vmax; height: 20vmax; /* 大小 */
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 60%);
+            mix-blend-mode: overlay; /* 叠加模式：让它像光一样照亮背景 */
+            border-radius: 50%;
+            pointer-events: none; /* 让鼠标能穿透它点击下面的按钮 */
+            z-index: 1; /* 在背景之上，内容之下 */
+            opacity: 0; /* 默认隐藏，动起来才显示 */
+            transform: translate(-50%, -50%) scale(1);
+            transition: transform 0.15s ease, opacity 0.5s ease; /* 点击时的缩放过渡 */
+        }
+        
+        /* 点击时的律动状态 */
+        #interactive-blob.active {
+            transform: translate(-50%, -50%) scale(1.8); /* 点击时瞬间变大 */
+            background: radial-gradient(circle, rgba(200, 230, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+            mix-blend-mode: plus-lighter; /* 变得更亮 */
+        }
     </style>
 </head>
 <body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
