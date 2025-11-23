@@ -261,5 +261,120 @@
             easing: 'ease-out-cubic',
         });
     </script>
+    <script>
+    // --- 1. 语言切换功能 ---
+    function toggleLanguage() {
+        const body = document.body;
+        const btnText = document.getElementById('lang-btn-text');
+        
+        // 切换 body 的 class
+        body.classList.toggle('english-mode');
+        
+        // 更新按钮文字
+        if (body.classList.contains('english-mode')) {
+            btnText.innerText = 'CN'; // 当前是英文，按钮显示“切回中文”
+        } else {
+            btnText.innerText = 'EN'; // 当前是中文，按钮显示“切去英文”
+        }
+    }
+
+    // --- 2. 回到顶部功能 ---
+    const backToTopBtn = document.getElementById('back-to-top');
+    
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
+    });
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- 3. 粒子特效 (Canvas Particle Network) ---
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+
+    // 配置参数
+    const particleConfig = {
+        count: 60,            // 粒子数量
+        color: 'rgba(59, 130, 246, 0.5)', // 粒子颜色 (蓝色)
+        connectionDist: 150,  // 连线距离
+        speed: 0.5            // 运动速度
+    };
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * particleConfig.speed;
+            this.vy = (Math.random() - 0.5) * particleConfig.speed;
+            this.size = Math.random() * 2 + 1;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            // 碰到边界反弹
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = particleConfig.color;
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < particleConfig.count; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, width, height);
+        
+        for (let i = 0; i < particles.length; i++) {
+            let p = particles[i];
+            p.update();
+            p.draw();
+
+            // 绘制连线
+            for (let j = i + 1; j < particles.length; j++) {
+                let p2 = particles[j];
+                let dx = p.x - p2.x;
+                let dy = p.y - p2.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+
+                if (dist < particleConfig.connectionDist) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(100, 149, 237, ${1 - dist/particleConfig.connectionDist})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animateParticles);
+    }
+
+    // 初始化运行
+    window.addEventListener('resize', () => { resize(); initParticles(); });
+    resize();
+    initParticles();
+    animateParticles();
+</script>
 </body>
 </html>
