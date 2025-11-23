@@ -55,60 +55,70 @@
         body.english-mode [lang="cn"] { display: none; }
         body.english-mode [lang="en"] { display: inline-block; }
 
-        /* --- 6. 极光流光背景动画 (Aurora Gradient - 缓慢深海版) --- */
+        /* --- 6. 极光流光背景动画 (深海聚光版) --- */
         .aurora-bg {
             position: absolute; inset: 0; overflow: hidden; z-index: 0;
-            background: #020617; /* 深海基底色 */
+            background: #020617; /* 背景底色：深黑 */
         }
+        
+        /* [关键] 这是一个盖在光斑上的“黑框遮罩” */
+        .aurora-bg::after {
+            content: ""; position: absolute; inset: 0; z-index: 1;
+            /* 径向渐变：中间透明，向四周逐渐变成纯黑 */
+            background: radial-gradient(ellipse at center, transparent 20%, #020617 85%);
+            pointer-events: none; /* 让鼠标能穿透遮罩 */
+        }
+
         .blob {
             position: absolute; border-radius: 50%;
-            filter: blur(100px); /* 增加模糊度，让交融更柔和 */
-            opacity: 0.6; /* 稍微增加一点不透明度，让色彩更实 */
-            /* 混合模式：让颜色叠加时产生更有趣的效果 */
-            mix-blend-mode: screen; 
+            filter: blur(80px); /* 模糊度 */
+            opacity: 0.7;
+            mix-blend-mode: screen;
+            /* 所有的光斑初始都放在屏幕正中心，靠动画移开 */
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        /* 🔵 蓝色光斑：负责左上到右下的对角线大幅移动 */
+        /* 🔵 蓝色：在左侧和上方游走 */
         .blob-1 {
-            top: -20%; left: -20%; width: 60vw; height: 60vw;
+            width: 40vw; height: 40vw; /* 尺寸改小 */
             background: #3b82f6;
-            animation: move-1 35s infinite ease-in-out alternate;
+            animation: wander-1 25s infinite ease-in-out alternate;
         }
-        /* 🟣 紫色光斑：负责底部的大范围呼吸和横移 */
+        /* 🟣 紫色：在右侧和下方游走 */
         .blob-2 {
-            bottom: -30%; right: -10%; width: 70vw; height: 70vw;
+            width: 45vw; height: 45vw;
             background: #7c3aed;
-            animation: move-2 40s infinite ease-in-out alternate-reverse;
+            animation: wander-2 30s infinite ease-in-out alternate-reverse;
         }
-        /* 💖 粉色光斑：负责中心的游走和剧烈的大小变化 */
+        /* 💖 粉色：在核心区域呼吸 */
         .blob-3 {
-            top: 30%; left: 30%; width: 50vw; height: 50vw;
+            width: 30vw; height: 30vw;
             background: #be185d;
-            opacity: 0.4;
-            animation: move-3 30s infinite ease-in-out alternate;
+            opacity: 0.5;
+            animation: wander-3 20s infinite ease-in-out alternate;
         }
 
-        /* --- 定义三个独立的复杂动画轨迹 --- */
+        /* --- 动画轨迹：始终围绕中心，不出黑框 --- */
         
-        /* 轨迹 1 (蓝): 大幅向右下移动并变大 */
-        @keyframes move-1 {
-            0% { transform: translate(0, 0) scale(0.8); }
-            50% { transform: translate(30vw, 20vh) scale(1.5); } /* 移动到屏幕中间偏右，变大1.5倍 */
-            100% { transform: translate(50vw, 50vh) scale(1.2); } /* 移动到右下角 */
+        @keyframes wander-1 {
+            0% { transform: translate(-80%, -80%) scale(1); }   /* 左上 */
+            33% { transform: translate(-20%, -20%) scale(1.2); } /* 靠近中心 */
+            66% { transform: translate(-60%, 10%) scale(0.8); }  /* 左下 */
+            100% { transform: translate(-70%, -70%) scale(1.1); }
         }
 
-        /* 轨迹 2 (紫): 横向慢移并像呼吸一样巨大化 */
-        @keyframes move-2 {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(-40vw, -10vh) scale(1.8); } /* 向左上方巨大化移动 */
+        @keyframes wander-2 {
+            0% { transform: translate(0%, 0%) scale(1); }        /* 中心 */
+            33% { transform: translate(40%, 40%) scale(1.3); }   /* 右下 */
+            66% { transform: translate(10%, -30%) scale(0.9); }  /* 右上 */
+            100% { transform: translate(30%, 30%) scale(1.2); }
         }
 
-        /* 轨迹 3 (粉): 在中心游走，忽大忽小 */
-        @keyframes move-3 {
-            0% { transform: translate(0, 0) scale(0.5) rotate(0deg); } /* 初始很小 */
-            33% { transform: translate(20vw, -30vh) scale(1.3) rotate(120deg); } /* 跑到右上方变大 */
-            66% { transform: translate(-20vw, 20vh) scale(0.8) rotate(240deg); } /* 跑到左下方变小 */
-            100% { transform: translate(0, 0) scale(0.5) rotate(360deg); } /* 回到原点 */
+        @keyframes wander-3 {
+            0% { transform: translate(-50%, -50%) scale(0.8); }
+            50% { transform: translate(-50%, -50%) scale(1.5); } /* 原地变大 */
+            100% { transform: translate(-30%, -70%) scale(1); }  /* 稍微偏离 */
         }
 
         /* --- 7. 鼠标交互光斑 (Interactive Blob) --- */
