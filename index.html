@@ -352,10 +352,10 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // 初始化动画
+        // 1. 初始化动画
         AOS.init({ once: true, offset: 100, easing: 'ease-out-cubic' });
 
-        // 语言切换
+        // 2. 语言切换
         function toggleLanguage() {
             const body = document.body;
             const btnText = document.getElementById('lang-btn-text');
@@ -363,7 +363,7 @@
             btnText.innerText = body.classList.contains('english-mode') ? 'CN' : 'EN';
         }
 
-        // 回到顶部显示控制
+        // 3. 回到顶部显示控制
         const backToTopBtn = document.getElementById('back-to-top');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
@@ -376,6 +376,40 @@
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+        // --- 4. [关键] 鼠标交互光斑逻辑 (补上这一段就有反应了) ---
+        const interBlob = document.getElementById('interactive-blob');
+        let curX = 0, curY = 0;
+        let tgX = 0, tgY = 0;
+
+        // 监听鼠标移动
+        window.addEventListener('mousemove', (event) => {
+            tgX = event.clientX;
+            tgY = event.clientY;
+            // 只有动鼠标时才显示，防止一开始停在角落
+            if(interBlob) interBlob.style.opacity = 1;
+        });
+
+        // 缓动跟随动画 (让光斑像在水里一样有延迟感)
+        function moveBlob() {
+            if(interBlob) {
+                curX += (tgX - curX) / 12; // 延迟系数，越大越慢
+                curY += (tgY - curY) / 12;
+                // 更新位置
+                interBlob.style.left = `${curX}px`;
+                interBlob.style.top = `${curY}px`;
+            }
+            requestAnimationFrame(moveBlob);
+        }
+        moveBlob(); // 启动动画循环
+
+        // 监听点击律动
+        window.addEventListener('mousedown', () => {
+            if(interBlob) interBlob.classList.add('active');
+        });
+        window.addEventListener('mouseup', () => {
+            if(interBlob) interBlob.classList.remove('active');
+        });
     </script>
 </body>
 </html>
