@@ -9,46 +9,64 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        /* --- 基础与动画设置 (保持之前的极光风格) --- */
-        body { background-color: #020617; color: #e2e8f0; overflow-x: hidden; }
-        .glass-nav { background: rgba(2, 6, 23, 0.7); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        /* --- 1. 基础设置 --- */
+        body { background-color: #020617; color: #e2e8f0; overflow-x: hidden; transition: all 0.3s; }
         
-        /* 玻璃卡片样式优化 */
+        /* --- 2. 双语切换逻辑 (核心) --- */
+        /* 默认显示中文，隐藏英文 */
+        [lang="en"] { display: none; }
+        [lang="cn"] { display: block; }
+        
+        /* 当 body 加上 'en-mode' 类时，反转显示 */
+        body.en-mode [lang="cn"] { display: none !important; }
+        body.en-mode [lang="en"] { display: block !important; }
+        
+        /* 特殊处理：inline 元素的显示方式 */
+        body.en-mode span[lang="en"] { display: inline !important; }
+
+        /* --- 3. 玻璃拟态 --- */
+        .glass-nav { 
+            background: rgba(2, 6, 23, 0.8); 
+            backdrop-filter: blur(12px); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
+        }
         .glass-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
         .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+            transform: translateY(-8px);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
         }
 
-        /* 图片占位符样式 (你要求的留框) */
+        /* --- 4. 图片占位符 (你要求的留框) --- */
         .img-placeholder {
             width: 100%;
             height: 100%;
-            background-color: #1e293b;
+            background: linear-gradient(45deg, #0f172a, #1e293b);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #64748b;
-            border: 2px dashed #334155;
+            color: #475569;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             transition: all 0.3s;
-            cursor: pointer;
+            position: absolute;
+            inset: 0;
         }
-        .img-placeholder:hover {
-            background-color: #253346;
+        .glass-card:hover .img-placeholder {
+            background: linear-gradient(45deg, #1e293b, #334155);
             color: #94a3b8;
-            border-color: #475569;
         }
-        .img-placeholder i { font-size: 2rem; margin-bottom: 0.5rem; }
-        .img-placeholder span { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .img-placeholder i { font-size: 2.5rem; margin-bottom: 0.8rem; opacity: 0.5; }
+        .img-placeholder span { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; }
 
-        /* 分类过滤器样式 */
+        /* --- 5. 筛选按钮 --- */
         .filter-btn {
             background: transparent;
             border: 1px solid rgba(255,255,255,0.1);
@@ -59,54 +77,70 @@
             background: rgba(59, 130, 246, 0.2);
             border-color: #3b82f6;
             color: white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
         }
 
-        /* 背景动画 Blob */
+        /* --- 6. 极光背景动画 --- */
         .aurora-bg { position: fixed; inset: 0; z-index: -1; background: #020617; }
         .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: float 10s infinite ease-in-out; }
-        .blob-1 { top: 0; left: 0; width: 50vw; height: 50vw; background: #1d4ed8; animation-delay: 0s; }
-        .blob-2 { bottom: 0; right: 0; width: 50vw; height: 50vw; background: #7c3aed; animation-delay: -5s; }
-        @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, 50px); } }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #172554; animation-delay: 0s; } /* 深蓝 */
+        .blob-2 { bottom: -10%; right: -10%; width: 50vw; height: 50vw; background: #4c1d95; animation-delay: -5s; } /* 深紫 */
+        @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, 40px); } }
+
+        /* 标签样式 */
+        .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); margin-right: 6px; }
     </style>
 </head>
-<body class="font-sans antialiased relative">
+<body class="font-sans antialiased relative selection:bg-blue-500 selection:text-white">
 
     <div class="aurora-bg">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
 
-    <nav class="fixed w-full z-50 glass-nav">
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold text-white flex items-center gap-2">
+            <a href="#" class="text-xl font-bold text-white flex items-center gap-2 tracking-wider">
                 <i class="ph ph-asterisk-simple text-blue-500"></i> Lilinyang.
             </a>
-            <div class="hidden md:flex space-x-8 text-sm text-gray-300">
-                <a href="#about" class="hover:text-blue-400 transition">About</a>
-                <a href="#projects" class="hover:text-blue-400 transition">Work</a>
-                <a href="#contact" class="hover:text-blue-400 transition">Contact</a>
+            
+            <div class="flex items-center gap-8">
+                <div class="hidden md:flex space-x-8 text-sm text-gray-300 font-medium">
+                    <a href="#about" class="hover:text-blue-400 transition"><span lang="cn">关于</span><span lang="en">About</span></a>
+                    <a href="#projects" class="hover:text-blue-400 transition"><span lang="cn">作品</span><span lang="en">Work</span></a>
+                    <a href="#contact" class="hover:text-blue-400 transition"><span lang="cn">联系</span><span lang="en">Contact</span></a>
+                </div>
+                
+                <button id="lang-btn" class="flex items-center gap-1 text-xs border border-gray-600 px-3 py-1.5 rounded-full hover:border-blue-400 hover:text-blue-400 transition">
+                    <i class="ph ph-translate"></i>
+                    <span class="font-bold" id="lang-text">CN / EN</span>
+                </button>
             </div>
         </div>
     </nav>
 
     <section class="min-h-screen flex items-center justify-center pt-20 relative">
         <div class="container mx-auto px-6 text-center z-10" data-aos="fade-up">
-            <p class="text-blue-400 tracking-widest text-sm font-semibold mb-4 uppercase">
-                M.U.S.T. Humanities and Arts / 2024-2026
+            <p class="text-blue-400 tracking-[0.2em] text-xs font-bold mb-6 uppercase border border-blue-900/50 bg-blue-900/20 inline-block px-4 py-2 rounded-full">
+                <span lang="cn">2024-2026 · 澳门科技大学 · 人文艺术学院</span>
+                <span lang="en">2024-2026 · M.U.S.T. · Humanities and Arts</span>
             </p>
+            
             <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                Designing for <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-                    Brand, Product & AI
+                <span lang="cn">设计无界</span><span lang="en">Designing Limitless</span><br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                    <span lang="cn">品牌 · 产品 · 智能</span><span lang="en">Brand · Product · AI</span>
                 </span>
             </h1>
+
             <p class="text-gray-400 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-                我是李林阳。专注于品牌产品与新媒体方向的设计师。
-                <br>积极拥抱新媒介，探索技术带来的视觉可能。
+                <span lang="cn">我是李林阳。专注于品牌产品与新媒体方向。积极拥抱新媒介，具备视频设计和AIGC绘图能力，探索技术带来的视觉可能。</span>
+                <span lang="en">I am Lilinyang. Focusing on branding, product, and new media. Embracing new mediums with video design and AIGC capabilities to explore visual possibilities driven by technology.</span>
             </p>
+
             <div class="flex justify-center gap-4">
-                <a href="#projects" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-full text-white transition shadow-lg shadow-blue-900/50">
-                    查看作品 Portfolio
+                <a href="#projects" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-full text-white transition shadow-lg shadow-blue-900/50 font-medium">
+                    <span lang="cn">浏览作品</span><span lang="en">View Portfolio</span>
                 </a>
             </div>
         </div>
@@ -114,150 +148,269 @@
 
     <section id="projects" class="py-24 relative z-10">
         <div class="container mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-white mb-6">Selected Works</h2>
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-white mb-8"><span lang="cn">精选项目</span><span lang="en">Selected Projects</span></h2>
                 
-                <div class="flex flex-wrap justify-center gap-3">
-                    <button class="filter-btn active px-4 py-2 rounded-full text-sm" onclick="filterProjects('all', this)">All</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm" onclick="filterProjects('ui', this)">UI/UX</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm" onclick="filterProjects('brand', this)">Branding</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm" onclick="filterProjects('product', this)">Product</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm" onclick="filterProjects('newmedia', this)">New Media</button>
-                    <button class="filter-btn px-4 py-2 rounded-full text-sm" onclick="filterProjects('ai', this)">AI & IP</button>
+                <div class="flex flex-wrap justify-center gap-3" id="filters">
+                    <button class="filter-btn active px-5 py-2 rounded-full text-sm" onclick="filter('all', this)">All</button>
+                    <button class="filter-btn px-5 py-2 rounded-full text-sm" onclick="filter('ui', this)">UI/UX</button>
+                    <button class="filter-btn px-5 py-2 rounded-full text-sm" onclick="filter('brand', this)">Branding</button>
+                    <button class="filter-btn px-5 py-2 rounded-full text-sm" onclick="filter('product', this)">Product</button>
+                    <button class="filter-btn px-5 py-2 rounded-full text-sm" onclick="filter('media', this)">New Media</button>
+                    <button class="filter-btn px-5 py-2 rounded-full text-sm" onclick="filter('ai', this)">AI & IP</button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                <div class="glass-card rounded-2xl overflow-hidden group project-item ui">
-                    <div class="h-64 w-full relative">
-                        <div class="img-placeholder">
-                            <i class="ph ph-image"></i>
-                            <span>Insert: MAISC Web Design</span>
-                        </div>
+                <div class="glass-card rounded-2xl group project-item ui" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-desktop"></i><span>MAISC Web Design</span></div>
                     </div>
                     <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs text-blue-400 font-mono border border-blue-400/30 px-2 py-1 rounded">2025</span>
-                            <span class="text-xs text-gray-500">UI/UX</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">澳门人工智能超算中心 MAISC</h3>
+                        <div class="mb-3 flex gap-2"><span class="tag text-blue-300 border-blue-500/30">2025</span><span class="tag text-gray-400">UI/UX</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">澳门人工智能超算中心</span><span lang="en">Macau AI Supercomputing Center</span></h3>
                         <p class="text-gray-400 text-sm line-clamp-2">
-                            以澳门区花“莲花”与运算核心为理念，打造区域性AI创新枢纽平台的可信数据空间设计。[cite: 31]
+                            <span lang="cn">以“莲花”与“运算”为核心理念，构建区域性AI创新枢纽平台的可信数据空间。</span>
+                            <span lang="en">Building a trusted data space for the regional AI innovation hub, inspired by "Lotus" and "Computing".</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-2xl overflow-hidden group project-item brand">
-                    <div class="h-64 w-full relative">
-                        <div class="img-placeholder">
-                            <i class="ph ph-beer-bottle"></i>
-                            <span>Insert: Kombucha Packaging</span>
-                        </div>
+                <div class="glass-card rounded-2xl group project-item product" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-stamp"></i><span>Wax Seal Product</span></div>
                     </div>
                     <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs text-pink-400 font-mono border border-pink-400/30 px-2 py-1 rounded">2025</span>
-                            <span class="text-xs text-gray-500">Packaging</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">Macau Kombucha 包装设计</h3>
+                        <div class="mb-3 flex gap-2"><span class="tag text-orange-300 border-orange-500/30">2024</span><span class="tag text-gray-400">Product</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">印迹·澳门火漆印章</span><span lang="en">Macao Imprint: Wax Seal</span></h3>
                         <p class="text-gray-400 text-sm line-clamp-2">
-                            融合澳门地图与地标元素，激发探索好奇心。桃子姜、咖啡柚子多口味系列设计。[cite: 571]
+                            <span lang="cn">灵感源自葡式碎石路，六边形与不规则石砖结合，每一个印章都是澳门的历史印迹。</span>
+                            <span lang="en">Inspired by Portuguese pavement. Hexagonal designs interlocking like history itself.</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-2xl overflow-hidden group project-item product">
-                    <div class="h-64 w-full relative">
-                        <div class="img-placeholder">
-                            <i class="ph ph-stamp"></i>
-                            <span>Insert: Wax Seal Product</span>
-                        </div>
+                <div class="glass-card rounded-2xl group project-item brand" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-beer-bottle"></i><span>Kombucha Packaging</span></div>
                     </div>
                     <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs text-orange-400 font-mono border border-orange-400/30 px-2 py-1 rounded">2024</span>
-                            <span class="text-xs text-gray-500">Product Design</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">印迹·澳门火漆印章</h3>
+                        <div class="mb-3 flex gap-2"><span class="tag text-pink-300 border-pink-500/30">2025</span><span class="tag text-gray-400">Packaging</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">澳门康普茶包装设计</span><span lang="en">Macau Kombucha Packaging</span></h3>
                         <p class="text-gray-400 text-sm line-clamp-2">
-                            灵感源自葡式碎石路，每一个六边形印章都是澳门独有的历史“印迹”。[cite: 129]
+                            <span lang="cn">融合澳门地图纹理与地标元素，桃子姜、咖啡柚子多口味系列设计，激发探索好奇心。</span>
+                            <span lang="en">Integrating Macau map textures and landmarks. Peach Ginger & Coffee Grapefruit series.</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-2xl overflow-hidden group project-item newmedia">
-                    <div class="h-64 w-full relative">
-                        <div class="img-placeholder">
-                            <i class="ph ph-device-mobile"></i>
-                            <span>Insert: Xiaohongshu Operation</span>
-                        </div>
+                <div class="glass-card rounded-2xl group project-item media" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-device-mobile"></i><span>RED Operation</span></div>
                     </div>
                     <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs text-red-400 font-mono border border-red-400/30 px-2 py-1 rounded">2024</span>
-                            <span class="text-xs text-gray-500">Operations</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">小红书·匠心荟澳</h3>
+                        <div class="mb-3 flex gap-2"><span class="tag text-red-300 border-red-500/30">2024</span><span class="tag text-gray-400">Operations</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">小红书·匠心荟澳</span><span lang="en">Jiangxin Huiao Operations</span></h3>
                         <p class="text-gray-400 text-sm line-clamp-2">
-                            国家艺术基金项目官方运营。管理8人团队，发布62篇笔记，累计阅读43W+。[cite: 368, 370]
+                            <span lang="cn">国家艺术基金项目。管理8人团队，发布62篇笔记，累计阅读43W+，负责拍摄与内容策划。</span>
+                            <span lang="en">National Arts Fund project. Managed 8-person team, 62 posts, 430k+ reads.</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-2xl overflow-hidden group project-item ai">
-                    <div class="h-64 w-full relative">
-                        <div class="img-placeholder">
-                            <i class="ph ph-film-strip"></i>
-                            <span>Insert: AI Video Cover</span>
-                        </div>
+                <div class="glass-card rounded-2xl group project-item ai" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-film-strip"></i><span>AI Video</span></div>
                     </div>
                     <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs text-purple-400 font-mono border border-purple-400/30 px-2 py-1 rounded">2025</span>
-                            <span class="text-xs text-gray-500">AI Video</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">AI实验短片《三羊开泰》</h3>
+                        <div class="mb-3 flex gap-2"><span class="tag text-purple-300 border-purple-500/30">2025</span><span class="tag text-gray-400">AI Video</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">AI短片《三羊开泰》</span><span lang="en">AI Film: Three Rams</span></h3>
                         <p class="text-gray-400 text-sm line-clamp-2">
-                            全流程AI创作：剧本(GPT4o)、视频(即梦/Midjourney)、音乐(Suno)。诠释“阳气动则万物生”。[cite: 1267]
+                            <span lang="cn">全流程AI创作（GPT4o剧本+Midjourney绘图+Suno音乐），诠释“阳气动则万物生”。</span>
+                            <span lang="en">Full AI workflow (GPT4o + MJ + Suno). Interpreting "Auspiciousness of Three Rams".</span>
                         </p>
                     </div>
                 </div>
 
-                <div class="glass-card rounded-2xl overflow-hidden group project-item brand">
-                    <div class="h-64 w-full relative">
-                        <div class="img-placeholder">
-                            <i class="ph ph-mountains"></i>
-                            <span>Insert: SUSGRU Logo</span>
-                        </div>
+                <div class="glass-card rounded-2xl group project-item brand" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-mountains"></i><span>Brand Logo</span></div>
                     </div>
                     <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs text-green-400 font-mono border border-green-400/30 px-2 py-1 rounded">2025</span>
-                            <span class="text-xs text-gray-500">Branding</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">磐山鹤 SUSGRU</h3>
+                        <div class="mb-3 flex gap-2"><span class="tag text-green-300 border-green-500/30">2025</span><span class="tag text-gray-400">Logo</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">磐山鹤 SUSGRU</span><span lang="en">SUSGRU Outdoor Brand</span></h3>
                         <p class="text-gray-400 text-sm line-clamp-2">
-                            户外运动品牌视觉。“生于磐石，鹤乘风起”，结合宋体与现代黑体设计的品牌标识。[cite: 1020]
+                            <span lang="cn">户外品牌视觉。“生于磐石，鹤乘风起”，结合宋体与现代黑体设计的品牌标识。</span>
+                            <span lang="en">Outdoor brand identity. "Rooted in rock, soaring like a crane." Serif & Sans-serif blend.</span>
                         </p>
                     </div>
                 </div>
-                
-                 <div class="glass-card rounded-2xl overflow-hidden group project-item product">
-                    <div class="h-64 w-full relative">
-                        <div class="img-placeholder">
-                            <i class="ph ph-book-bookmark"></i>
-                            <span>Insert: Book Design</span>
-                        </div>
+
+                <div class="glass-card rounded-2xl group project-item product" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-book-open"></i><span>Book Design</span></div>
                     </div>
                     <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs text-gray-400 font-mono border border-gray-400/30 px-2 py-1 rounded">2025</span>
-                            <span class="text-xs text-gray-500">Publication</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-2">《暗河》诗集装帧</h3>
+                        <div class="mb-3 flex gap-2"><span class="tag text-gray-300 border-gray-500/30">2025</span><span class="tag text-gray-400">Book</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">《暗河》诗集装帧</span><span lang="en">"Underground River" Poetry</span></h3>
                         <p class="text-gray-400 text-sm line-clamp-2">
-                            许立志诗集再版设计。裸背锁线装订，用极简的排版隐喻流水线工人的心声。[cite: 258]
+                            <span lang="cn">许立志诗集再版。裸背锁线装订，黑色基调隐喻流水线工人的无声呐喊。</span>
+                            <span lang="en">Xu Lizhi poetry re-edition. Naked spine binding, reflecting the silent cry of workers.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item product" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-t-shirt"></i><span>Merchandise</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-blue-300 border-blue-500/30">2025</span><span class="tag text-gray-400">Merch</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">澳科大文创周边</span><span lang="en">M.U.S.T. Merchandise</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">帆布袋、T恤、冰箱贴全案设计。独立完成从构思到厂家对接落地的全流程。</span>
+                            <span lang="en">Tote bag, T-shirt, Magnet. Independent execution from concept to production.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item brand" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-lightning"></i><span>Drink Can</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-yellow-300 border-yellow-500/30">2025</span><span class="tag text-gray-400">Packaging</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">Power13 运动饮料</span><span lang="en">Power13 Sports Drink</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">结合墨西哥“亡灵节”文化元素，打造自然纯粹、配料干净的运动饮品视觉。</span>
+                            <span lang="en">Combining Mexican "Day of the Dead" elements for a natural, pure sports drink visual.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item brand" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-package"></i><span>Food Packaging</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-yellow-300 border-yellow-500/30">2024</span><span class="tag text-gray-400">Heritage</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">金燕西洋牛油糕</span><span lang="en">Kam In Butter Cake</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">澳门非遗品牌包装。提取葡式花纹、海洋文化与博彩文化，中英葡三语排版。</span>
+                            <span lang="en">Macau Intangible Heritage brand. Portuguese patterns & trilingual layout.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item ai" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-magic-wand"></i><span>AI Therapy</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-purple-300 border-purple-500/30">2024</span><span class="tag text-gray-400">Project Mgmt</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">AI绘画艺术疗愈</span><span lang="en">AI Art Therapy</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">人工智能协同绘画体验课程。利用“绘愈之境”程序，培养特殊教育儿童创造力。</span>
+                            <span lang="en">AI collaborative painting course for special education children's creativity.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item brand" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-house"></i><span>Community Logo</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-green-300 border-green-500/30">2022</span><span class="tag text-gray-400">Logo</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">澳生之家青年社区</span><span lang="en">Macau Student Home</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">Logo设计大赛一等奖。莲花（澳门）与房屋（家）的结合，寓意温馨舒适的活动基地。</span>
+                            <span lang="en">1st Prize Winner. Combining Lotus (Macau) and House (Home) concepts.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item media" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-chat-circle-text"></i><span>Pass HK RED</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-red-300 border-red-500/30">2025</span><span class="tag text-gray-400">Growth</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">小红书·Pass记港办</span><span lang="en">Pass HK Operations</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">从0到1搭建私域，独立完成劳务派遣账号运营。月发布37篇，0投流自然增粉。</span>
+                            <span lang="en">Built private traffic from scratch. 37 posts/month, organic growth without ads.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item product" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-star"></i><span>Picture Book</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-gray-300 border-gray-500/30">2024</span><span class="tag text-gray-400">Book</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">《小王子》再版设计</span><span lang="en">Le Petit Prince Re-edition</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">基于几何图形（方圆三角）的视觉重构。手工裸背锁线装帧，200x200mm 方形开本。</span>
+                            <span lang="en">Visual reconstruction based on geometric shapes. Handmade naked spine binding.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item brand" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-bowl-food"></i><span>Menu Poster</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-yellow-300 border-yellow-500/30">2025</span><span class="tag text-gray-400">Visual</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">西安面馆·商业海报</span><span lang="en">Xi'an Noodle Poster</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">高饱和度视觉冲击，层级分明的信息编排，传递“正宗风味”与“食材新鲜”卖点。</span>
+                            <span lang="en">High saturation visual impact, clear hierarchy conveying "Authentic Flavor".</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item brand" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-text-t"></i><span>Font Design</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-gray-300 border-gray-500/30">2022</span><span class="tag text-gray-400">Typography</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">黑圆楷·字体设计</span><span lang="en">Black Round Kai Font</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">保留传统楷体特点，融合现代黑粗体风韵。获第十一届方正字体设计大赛入围奖。</span>
+                            <span lang="en">Mixing traditional Kai with modern bold styles. Founder Type Design Award Finalist.</span>
+                        </p>
+                    </div>
+                </div>
+
+                 <div class="glass-card rounded-2xl group project-item product" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-envelope"></i><span>Stamp Design</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-blue-300 border-blue-500/30">2022</span><span class="tag text-gray-400">Creative</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">澳门永利·冬奥邮票</span><span lang="en">Winter Olympics Stamps</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">融合澳门旅游塔、大三巴剪影与冬奥运动。获“我们的冬奥”邮票设计比赛入围奖。</span>
+                            <span lang="en">Merging Macau Tower & St. Paul's silhouettes with winter sports. Competition finalist.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl group project-item ai" data-aos="fade-up">
+                    <div class="h-60 w-full relative overflow-hidden">
+                        <div class="img-placeholder"><i class="ph ph-fish"></i><span>NFT Design</span></div>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-3 flex gap-2"><span class="tag text-purple-300 border-purple-500/30">2023</span><span class="tag text-gray-400">Digital IP</span></div>
+                        <h3 class="text-xl font-bold text-white mb-2"><span lang="cn">鱼鱼鱼 NFT</span><span lang="en">Fish Fish Fish NFT</span></h3>
+                        <p class="text-gray-400 text-sm line-clamp-2">
+                            <span lang="cn">基于元宇宙概念的数字鱼IP开发。绘制120个NFT藏品，涵盖普通至传说四个等级。</span>
+                            <span lang="en">Digital Fish IP for Metaverse. Created 120 NFTs across 4 rarity tiers.</span>
                         </p>
                     </div>
                 </div>
@@ -268,54 +421,77 @@
 
     <section id="about" class="py-20 bg-black/20">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-white mb-10 text-center">Skills & Tools</h2>
-            <div class="flex flex-wrap justify-center gap-6 max-w-4xl mx-auto">
-                <span class="skill-tag px-6 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300">Figma (交互)</span>
-                <span class="skill-tag px-6 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300">Photoshop</span>
-                <span class="skill-tag px-6 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300">Illustrator</span>
-                <span class="skill-tag px-6 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300">Blender/犀牛</span>
-                <span class="skill-tag px-6 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300">After Effects</span>
-                <span class="skill-tag px-6 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300">AIGC (Midjourney/GPT)</span>
-                <span class="skill-tag px-6 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-300">New Media Ops</span>
+            <h2 class="text-3xl font-bold text-white mb-10 text-center"><span lang="cn">专业技能</span><span lang="en">Skills & Tools</span></h2>
+            <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto text-sm">
+                <span class="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">Figma (UI/UX)</span>
+                <span class="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">Photoshop (PS)</span>
+                <span class="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">Illustrator (AI)</span>
+                <span class="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">Blender / Rhino 3D</span>
+                <span class="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">After Effects (Motion)</span>
+                <span class="px-5 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">Premiere Pro</span>
+                <span class="px-5 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-purple-200">AIGC (Midjourney/GPT)</span>
+                <span class="px-5 py-2 bg-red-500/20 border border-red-500/30 rounded-full text-red-200">New Media Ops</span>
             </div>
         </div>
     </section>
 
     <footer id="contact" class="py-12 border-t border-white/5 bg-[#020617] relative z-20">
         <div class="container mx-auto px-6 text-center">
-            <p class="text-2xl font-bold text-white mb-8">Let's Create Together.</p>
-            <div class="flex flex-col md:flex-row justify-center gap-8 mb-8">
-                <a href="mailto:940213696@qq.com" class="flex items-center justify-center gap-2 text-gray-400 hover:text-blue-400 transition">
+            <p class="text-2xl font-bold text-white mb-8"><span lang="cn">保持联系</span><span lang="en">Let's Connect</span></p>
+            <div class="flex flex-col md:flex-row justify-center gap-6 mb-8">
+                <a href="mailto:940213696@qq.com" class="flex items-center justify-center gap-2 text-gray-400 hover:text-blue-400 transition bg-white/5 px-6 py-3 rounded-xl">
                     <i class="ph ph-envelope-simple text-xl"></i> 940213696@qq.com
                 </a>
-                <a href="tel:+8617707373986" class="flex items-center justify-center gap-2 text-gray-400 hover:text-blue-400 transition">
+                <a href="tel:+8617707373986" class="flex items-center justify-center gap-2 text-gray-400 hover:text-blue-400 transition bg-white/5 px-6 py-3 rounded-xl">
                     <i class="ph ph-phone text-xl"></i> +86 17707373986
                 </a>
             </div>
-            <p class="text-gray-600 text-sm">© 2026 Lilinyang. Based on Portfolio PDF. [cite: 6]</p>
+            <p class="text-gray-600 text-xs">© 2026 Lilinyang. <span lang="cn">版权所有</span><span lang="en">All Rights Reserved.</span></p>
         </div>
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init();
+        // 1. 动画初始化
+        AOS.init({ once: true, duration: 800 });
 
-        // 简单的分类筛选逻辑
-        function filterProjects(category, btn) {
-            // 1. 按钮样式切换
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'border-blue-500', 'text-white'));
-            btn.classList.add('active');
+        // 2. 双语切换逻辑
+        const langBtn = document.getElementById('lang-btn');
+        const langText = document.getElementById('lang-text');
+        const body = document.body;
 
-            // 2. 项目显示/隐藏
+        langBtn.addEventListener('click', () => {
+            body.classList.toggle('en-mode');
+            if (body.classList.contains('en-mode')) {
+                langText.textContent = 'EN / CN'; // 英文模式下显示
+            } else {
+                langText.textContent = 'CN / EN'; // 中文模式下显示
+            }
+        });
+
+        // 3. 项目筛选逻辑
+        function filter(category, btn) {
+            // 按钮样式
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active', 'border-blue-500', 'text-white', 'bg-blue-500/20');
+                b.classList.add('border-white/10', 'text-gray-400');
+            });
+            btn.classList.add('active', 'border-blue-500', 'text-white', 'bg-blue-500/20');
+            btn.classList.remove('border-white/10', 'text-gray-400');
+
+            // 筛选项目
             const items = document.querySelectorAll('.project-item');
             items.forEach(item => {
                 if (category === 'all' || item.classList.contains(category)) {
                     item.style.display = 'block';
-                    // 简单的淡入动画
-                    item.style.opacity = '0';
-                    setTimeout(() => item.style.opacity = '1', 50);
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+                    }, 50);
                 } else {
-                    item.style.display = 'none';
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(20px)';
+                    setTimeout(() => item.style.display = 'none', 300);
                 }
             });
         }
