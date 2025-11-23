@@ -6,18 +6,33 @@
     <title>李林阳 Lilinyang | Portfolio 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
         /* --- 1. 基础设置 --- */
-        body { background-color: #020617; color: #e2e8f0; }
+        body { background-color: #020617; color: #e2e8f0; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
 
-        /* --- 2. 玻璃导航栏 --- */
+        /* --- 2. 玻璃导航栏 & 卡片 --- */
         .glass-nav { 
             background: rgba(2, 6, 23, 0.7); 
             backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
         }
 
         /* --- 3. 液态玻璃按钮 --- */
@@ -55,15 +70,14 @@
         body.english-mode [lang="cn"] { display: none; }
         body.english-mode [lang="en"] { display: inline-block; }
 
-        /* --- 6. 极光流光背景动画 (深海液态干扰版) --- */
+        /* --- 6. 极光流光背景动画 --- */
         .aurora-bg {
-            position: absolute; inset: 0; overflow: hidden; z-index: 0;
+            position: fixed; inset: 0; overflow: hidden; z-index: -1;
             background: #020617;
         }
-        /* 黑框遮罩：压暗四周，形成聚光灯效果 */
         .aurora-bg::after {
             content: ""; position: absolute; inset: 0; z-index: 1;
-            background: radial-gradient(ellipse at center, transparent 20%, #020617 85%);
+            background: radial-gradient(ellipse at center, transparent 20%, #020617 90%);
             pointer-events: none;
         }
 
@@ -71,270 +85,279 @@
             position: absolute; border-radius: 50%;
             filter: blur(80px); opacity: 0.6;
             mix-blend-mode: screen;
-            /* 关键：加上过渡效果，让鼠标干扰时的移动像水一样顺滑 */
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            /* 关键：使用 will-change 优化性能 */
+            will-change: transform, top, left;
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        /* 改用 top/left 进行缓慢游走，腾出 transform 给鼠标交互用 */
+        /* 定义三个光斑的初始位置和漫游动画 */
         .blob-1 {
-            width: 40vw; height: 40vw; background: #3b82f6; /* 蓝 */
-            animation: wander-pos-1 25s infinite alternate ease-in-out;
+            width: 40vw; height: 40vw; background: #1d4ed8; /* 蓝 */
+            top: 20%; left: 20%;
+            animation: wander-1 20s infinite alternate ease-in-out;
         }
         .blob-2 {
             width: 45vw; height: 45vw; background: #7c3aed; /* 紫 */
-            animation: wander-pos-2 30s infinite alternate-reverse ease-in-out;
+            bottom: 20%; right: 20%;
+            animation: wander-2 25s infinite alternate-reverse ease-in-out;
         }
         .blob-3 {
             width: 30vw; height: 30vw; background: #be185d; /* 粉 */
-            opacity: 0.5;
-            animation: wander-pos-3 20s infinite alternate ease-in-out;
+            top: 50%; left: 50%; opacity: 0.4;
+            animation: wander-3 18s infinite alternate ease-in-out;
         }
 
-        /* 动画定义：只改变位置，不改变 transform */
-        @keyframes wander-pos-1 {
-            0% { top: 10%; left: 10%; }
-            100% { top: 40%; left: 50%; }
-        }
-        @keyframes wander-pos-2 {
-            0% { bottom: 10%; right: 10%; }
-            100% { bottom: 40%; right: 40%; }
-        }
-        @keyframes wander-pos-3 {
-            0% { top: 40%; left: 40%; width: 30vw; }
-            100% { top: 50%; left: 50%; width: 45vw; } 
+        @keyframes wander-1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(10%, 10%) scale(1.1); } }
+        @keyframes wander-2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-10%, -5%) scale(0.9); } }
+        @keyframes wander-3 { 0% { transform: translate(-50%, -50%) scale(1); } 100% { transform: translate(-40%, -60%) scale(1.2); } }
+        
+        /* 文本渐变 */
+        .text-gradient {
+            background: linear-gradient(to right, #60a5fa, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
-<body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
+<body class="font-sans antialiased selection:bg-blue-500 selection:text-white relative">
+
+    <div class="aurora-bg" id="aurora-container">
+        <div class="blob blob-1" id="blob-1"></div>
+        <div class="blob blob-2" id="blob-2"></div>
+        <div class="blob blob-3" id="blob-3"></div>
+    </div>
 
     <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold tracking-tighter text-white relative z-50">Lilinyang.</a>
-            <div class="flex items-center gap-6">
-                <div class="hidden md:flex space-x-8 text-sm font-medium">
-                    <a href="#about" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">关于</span><span lang="en">About</span></a>
-                    <a href="#uiux" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">作品</span><span lang="en">Works</span></a>
-                    <a href="#contact" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">联系</span><span lang="en">Contact</span></a>
-                </div>
-                <button onclick="toggleLanguage()" class="text-xs font-bold border border-slate-600 px-3 py-1 rounded-full text-slate-400 hover:text-white hover:border-white transition uppercase">
-                    <span id="lang-btn-text">EN</span>
+            <a href="#" class="text-2xl font-bold tracking-tighter text-white relative z-50 flex items-center gap-2">
+                <i class="ph ph-asterisk-simple text-blue-400"></i> Lilinyang.
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
+                <a href="#home" class="hover:text-blue-400 transition-colors"><span lang="cn">首页</span><span lang="en">Home</span></a>
+                <a href="#projects" class="hover:text-blue-400 transition-colors"><span lang="cn">项目</span><span lang="en">Projects</span></a>
+                <a href="#about" class="hover:text-blue-400 transition-colors"><span lang="cn">关于</span><span lang="en">About</span></a>
+                <a href="#contact" class="hover:text-blue-400 transition-colors"><span lang="cn">联系</span><span lang="en">Contact</span></a>
+                
+                <button id="lang-toggle" class="px-3 py-1 rounded-full border border-gray-700 hover:border-blue-500 transition-colors text-xs">
+                    <span lang="cn">EN</span><span lang="en">中</span>
                 </button>
+            </div>
+
+            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none">
+                <i class="ph ph-list text-2xl"></i>
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="md:hidden hidden bg-[#020617] border-b border-gray-800 absolute w-full">
+            <div class="flex flex-col px-6 py-4 space-y-4 text-gray-300">
+                <a href="#home" class="hover:text-blue-400"><span lang="cn">首页</span><span lang="en">Home</span></a>
+                <a href="#projects" class="hover:text-blue-400"><span lang="cn">项目</span><span lang="en">Projects</span></a>
+                <a href="#about" class="hover:text-blue-400"><span lang="cn">关于</span><span lang="en">About</span></a>
+                <button id="mobile-lang-toggle" class="text-left hover:text-blue-400">Switch Language</button>
             </div>
         </div>
     </nav>
 
-    <section id="about" class="h-screen flex items-center justify-center relative overflow-hidden bg-slate-950 pb-32">
-        
-        <div class="aurora-bg">
-            <div class="blob blob-1"></div>
-            <div class="blob blob-2"></div>
-            <div class="blob blob-3"></div>
-        </div>
-
-        <div class="container mx-auto px-6 relative z-10 text-center">
-            <div data-aos="fade-up" data-aos-duration="1000">
-                <p class="text-blue-400 font-medium mb-6 tracking-[0.3em] uppercase text-sm">
-                    <span lang="cn">2026 个人作品集</span><span lang="en">Portfolio 2026</span>
-                </p>
-                
-                <h1 class="text-5xl md:text-8xl font-bold leading-tight mb-8 text-white drop-shadow-lg">
-                    <span lang="cn">品牌 · 产品 · 新媒体</span>
-                    <span lang="en">Brand · Product · New Media</span>
-                    <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
-                        <span lang="cn">数字设计</span><span lang="en">Digital Designer</span>
-                    </span>
-                </h1>
-                
-                <p class="text-lg md:text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-                    <span lang="cn">澳门科技大学硕士在读。专注于品牌重塑与 AIGC 视觉探索，致力于创造具有商业价值与艺术温度的数字体验。</span>
-                    <span lang="en">Master's student at M.U.S.T. Focusing on brand reshaping and AIGC visual exploration. Creating digital experiences with commercial value.</span>
-                </p>
-                
-                <div class="flex justify-center items-center">
-                    <a href="#uiux" class="btn-liquid px-12 py-4 rounded-full text-white font-bold tracking-wide shadow-[0_0_20px_rgba(59,130,246,0.6)] hover:scale-105 transform transition">
-                        <span lang="cn">查看作品</span><span lang="en">View Works</span>
-                    </a>
-                </div>
+    <section id="home" class="relative min-h-screen flex items-center justify-center pt-20">
+        <div class="container mx-auto px-6 text-center z-10" data-aos="fade-up" data-aos-duration="1000">
+            <div class="inline-block mb-4 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-sm font-medium">
+                <span lang="cn">👋 欢迎来到我的数字花园</span><span lang="en">👋 Welcome to my digital garden</span>
             </div>
-        </div>
-        
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-slate-500 animate-bounce z-20 pointer-events-none">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-            </svg>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight">
+                <span lang="cn">设计</span><span lang="en">Designing</span> <br class="md:hidden"/>
+                <span class="text-gradient">
+                    <span lang="cn">无界体验</span><span lang="en">Limitless</span>
+                </span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+                <span lang="cn">我是李林阳。一名热衷于创造极致交互体验的全栈开发者与设计师。在这里，代码与美学共舞。</span>
+                <span lang="en">I am Lilinyang. A full-stack developer & designer passionate about crafting ultimate interactive experiences. Where code meets aesthetics.</span>
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#projects" class="btn-liquid px-8 py-3 rounded-full text-white font-medium">
+                    <span lang="cn">浏览作品</span><span lang="en">View Work</span>
+                </a>
+                <a href="#contact" class="px-8 py-3 rounded-full border border-gray-700 hover:bg-gray-800 transition-all text-gray-300">
+                    <span lang="cn">联系我</span><span lang="en">Contact Me</span>
+                </a>
+            </div>
         </div>
     </section>
 
-    <section id="uiux" class="py-20 bg-slate-950 relative z-10">
+    <section id="projects" class="py-24 relative z-10">
         <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-slate-800 pb-8">
-                <div data-aos="fade-up">
-                    <h2 class="text-4xl font-bold text-white mb-2">Selected Works</h2>
-                    <p class="text-slate-500">UI/UX · Branding · Digital IP</p>
+            <div class="flex justify-between items-end mb-12" data-aos="fade-right">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-2"><span lang="cn">精选项目</span><span lang="en">Selected Projects</span></h2>
+                    <p class="text-gray-400"><span lang="cn">最近的一些探索与实践</span><span lang="en">Recent explorations and practices</span></p>
                 </div>
+                <a href="#" class="hidden md:flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                    <span lang="cn">查看全部</span><span lang="en">View All</span> <i class="ph ph-arrow-right ml-2"></i>
+                </a>
             </div>
 
-            <div class="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
-                
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300" data-aos="fade-up">
-                    <div class="w-full overflow-hidden bg-black">
-                        <img src="2.png" alt="MAISC Cover" class="w-full h-auto object-cover transition duration-700 group-hover:scale-105">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass-card rounded-2xl overflow-hidden p-1" data-aos="fade-up" data-aos-delay="100">
+                    <div class="bg-gray-900/50 rounded-xl h-48 md:h-56 w-full mb-4 overflow-hidden relative group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 to-slate-900 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                            <i class="ph ph-code text-4xl text-blue-400/50"></i>
+                        </div>
                     </div>
-                    <div class="p-6 relative z-10">
+                    <div class="px-4 pb-4">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">UI/UX Design</span>
-                            <span class="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">Web / App</span>
+                            <span class="text-xs font-mono text-blue-400">WEB APP</span>
+                            <a href="#" class="text-gray-400 hover:text-white"><i class="ph ph-arrow-up-right text-lg"></i></a>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">澳门人工智能超算中心 MAISC</h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-4">为 MAISC 打造的可信数据空间 [cite: 31]。包含 PC 端与移动端完整设计规范，融合莲花与运算概念。</p>
-                        <div class="flex gap-2 overflow-hidden">
-                            <img src="1.png" class="w-10 h-10 object-cover rounded border border-slate-600 opacity-60 group-hover:opacity-100 transition">
-                            <img src="3.png" class="w-10 h-10 object-cover rounded border border-slate-600 opacity-60 group-hover:opacity-100 transition">
-                            <img src="4.png" class="w-10 h-10 object-cover rounded border border-slate-600 opacity-60 group-hover:opacity-100 transition">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up" data-aos-delay="100">
-                    <div class="aspect-[4/5] w-full overflow-hidden bg-slate-800">
-                        <img src="https://via.placeholder.com/600x750/fca5a5/991b1b?text=Macau+Kombucha" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                    </div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-6">
-                        <h3 class="text-xl font-bold text-white">澳门康普茶 Packaging</h3>
-                        <p class="text-slate-300 text-sm">结合澳门地图纹样的本土茶饮包装设计 [cite: 571]。</p>
-                    </div>
-                </div>
-
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-video w-full overflow-hidden relative">
-                        <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                            <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center group-hover:bg-blue-600 transition">
-                                <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                            </div>
-                        </div>
-                        <img src="https://via.placeholder.com/800x450/3b82f6/ffffff?text=AI+Video+Project" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                    </div>
-                    <div class="p-5">
-                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1 block">AIGC Video</span>
-                        <h3 class="text-lg font-bold text-white">AI实验短片：三羊开泰</h3>
-                        <p class="text-slate-400 text-sm">全流程 AI 生成视频与音乐，探索传统文化的数字化表达 [cite: 1267]。</p>
-                    </div>
-                </div>
-
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-[3/4] w-full overflow-hidden bg-slate-800">
-                        <img src="https://via.placeholder.com/600x800/b91c1c/fcd34d?text=Golden+Swallow" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                    </div>
-                    <div class="p-5">
-                        <span class="text-xs font-bold text-yellow-500 uppercase tracking-wider mb-1 block">Branding</span>
-                        <h3 class="text-lg font-bold text-white">金燕西洋牛油糕</h3>
-                        <p class="text-slate-400 text-sm mt-1">百年老字号品牌重塑，融合葡式花纹与澳门海洋文化 [cite: 866]。</p>
-                    </div>
-                </div>
-
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-gradient-to-br from-pink-600 to-rose-600 p-8 text-white cursor-pointer transform transition hover:-translate-y-2" data-aos="fade-up">
-                    <div class="flex justify-between items-start mb-8">
-                        <h3 class="text-2xl font-bold">新媒体运营<br>匠心荟澳</h3>
-                        <span class="bg-white/20 px-3 py-1 rounded-full text-xs backdrop-blur-sm">Project</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-4xl font-bold">579</p>
-                            <p class="text-sm opacity-80">粉丝增长</p>
-                        </div>
-                        <div>
-                            <p class="text-4xl font-bold">43W+</p>
-                            <p class="text-sm opacity-80">累计阅读</p>
+                        <h3 class="text-xl font-bold mb-2 text-white">Nebula Dashboard</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">
+                            <span lang="cn">基于 React 和 D3.js 的数据可视化分析平台，专为复杂数据集设计。</span>
+                            <span lang="en">A data visualization platform based on React and D3.js, designed for complex datasets.</span>
+                        </p>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 bg-white/5 rounded text-xs text-gray-300">React</span>
+                            <span class="px-2 py-1 bg-white/5 rounded text-xs text-gray-300">Tailwind</span>
                         </div>
                     </div>
-                    <p class="mt-6 text-sm opacity-90 border-t border-white/20 pt-4">国家艺术基金2024项目官方账号从0到1搭建 [cite: 368]。</p>
                 </div>
 
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-square w-full overflow-hidden bg-slate-800">
-                        <img src="https://via.placeholder.com/600x600/171717/e5e5e5?text=Power13+Energy" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                <div class="glass-card rounded-2xl overflow-hidden p-1" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-gray-900/50 rounded-xl h-48 md:h-56 w-full mb-4 overflow-hidden relative group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-900 to-slate-900 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                            <i class="ph ph-paint-brush text-4xl text-purple-400/50"></i>
+                        </div>
                     </div>
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-purple-400 uppercase tracking-wider mb-1 block">Visuals</span>
-                        <h3 class="text-xl font-bold text-white">Power13 运动饮料</h3>
-                        <p class="text-slate-400 text-sm mt-2">墨西哥“亡灵节”文化与运动元素的碰撞 [cite: 689]。</p>
-                    </div>
-                </div>
-
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-square w-full overflow-hidden bg-white">
-                        <img src="https://via.placeholder.com/600x600/ffffff/000000?text=MUST+Creative" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                    </div>
-                    <div class="p-5">
-                        <span class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1 block">Product</span>
-                        <h3 class="text-lg font-bold text-white">澳科大 25周年文创</h3>
-                        <p class="text-slate-400 text-sm mt-1">帆布袋、T恤与冰箱贴设计，全流程落地执行 [cite: 153]。</p>
-                    </div>
-                </div>
-
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-900 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-square w-full overflow-hidden bg-slate-800">
-                        <img src="https://via.placeholder.com/600x600/14b8a6/ccfbf1?text=Fish+NFT" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                    </div>
-                    <div class="p-5">
-                        <span class="text-xs font-bold text-teal-400 uppercase tracking-wider mb-1 block">Digital Art</span>
-                        <h3 class="text-lg font-bold text-white">鱼鱼鱼 NFT Collection</h3>
-                        <p class="text-slate-400 text-sm mt-1">120个数字藏品，隐喻元宇宙中的人间百态 [cite: 1333]。</p>
-                    </div>
-                </div>
-                
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-slate-800 cursor-pointer border border-slate-700/50" data-aos="fade-up">
-                    <div class="aspect-[3/2] w-full overflow-hidden bg-white flex items-center justify-center">
-                        <img src="https://via.placeholder.com/600x400/ffffff/000000?text=SUSGRU+Logo" class="w-full h-full object-cover transition duration-700 group-hover:scale-105">
-                    </div>
-                    <div class="p-5">
-                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 block">Logo Design</span>
-                        <h3 class="text-lg font-bold text-white">磐山鹤 SUSGRU</h3>
-                        <p class="text-slate-400 text-sm">户外运动品牌标识设计，生于磐石，鹤乘风起 [cite: 1020]。</p>
+                    <div class="px-4 pb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-mono text-purple-400">UI/UX KIT</span>
+                            <a href="#" class="text-gray-400 hover:text-white"><i class="ph ph-arrow-up-right text-lg"></i></a>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Glass OS System</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">
+                            <span lang="cn">一套面向未来的操作系统概念设计，探索空间计算与玻璃拟态的结合。</span>
+                            <span lang="en">A futuristic OS concept design exploring the combination of spatial computing and glassmorphism.</span>
+                        </p>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 bg-white/5 rounded text-xs text-gray-300">Figma</span>
+                            <span class="px-2 py-1 bg-white/5 rounded text-xs text-gray-300">Spline</span>
+                        </div>
                     </div>
                 </div>
 
+                <div class="glass-card rounded-2xl overflow-hidden p-1" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bg-gray-900/50 rounded-xl h-48 md:h-56 w-full mb-4 overflow-hidden relative group">
+                        <div class="absolute inset-0 bg-gradient-to-br from-pink-900 to-slate-900 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                            <i class="ph ph-robot text-4xl text-pink-400/50"></i>
+                        </div>
+                    </div>
+                    <div class="px-4 pb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-mono text-pink-400">AI TOOL</span>
+                            <a href="#" class="text-gray-400 hover:text-white"><i class="ph ph-arrow-up-right text-lg"></i></a>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-white">Prompt Genius</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-2">
+                            <span lang="cn">帮助创意工作者生成高质量 Midjourney 提示词的智能助手。</span>
+                            <span lang="en">An intelligent assistant helping creatives generate high-quality Midjourney prompts.</span>
+                        </p>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 bg-white/5 rounded text-xs text-gray-300">OpenAI API</span>
+                            <span class="px-2 py-1 bg-white/5 rounded text-xs text-gray-300">Next.js</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer id="contact" class="py-24 bg-slate-950 border-t border-slate-900 text-center relative overflow-hidden">
-        <div class="container mx-auto px-6 relative z-10">
-            <h2 class="text-4xl md:text-5xl font-bold text-white mb-8" data-aos="fade-up">Let's Create Together.</h2>
-            <div class="flex flex-col md:flex-row justify-center items-center gap-6" data-aos="fade-up" data-aos-delay="100">
-                <a href="tel:+8617707373986" class="flex items-center space-x-3 text-slate-400 hover:text-white transition group">
-                    <span class="p-3 bg-slate-800 rounded-full group-hover:bg-blue-600 transition">📞</span>
-                    <span class="text-xl">+86 17707373986</span>
-                </a>
-                <span class="hidden md:block text-slate-700">|</span>
-                <a href="mailto:940213696@qq.com" class="flex items-center space-x-3 text-slate-400 hover:text-white transition group">
-                    <span class="p-3 bg-slate-800 rounded-full group-hover:bg-blue-600 transition">📧</span>
-                    <span class="text-xl">940213696@qq.com</span>
-                </a>
+    <section id="about" class="py-24 relative z-10 bg-black/20">
+        <div class="container mx-auto px-6" data-aos="fade-up">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-8"><span lang="cn">技术栈</span><span lang="en">Tech Stack</span></h2>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <span class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300">JavaScript (ES6+)</span>
+                    <span class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300">React / Next.js</span>
+                    <span class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300">Tailwind CSS</span>
+                    <span class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300">Node.js</span>
+                    <span class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300">Figma</span>
+                    <span class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-700 text-gray-300">Python</span>
+                </div>
             </div>
-            <p class="mt-16 text-xs text-slate-700">© 2026 Lilinyang Portfolio. Built with GitHub & Tailwind.</p>
+        </div>
+    </section>
+
+    <footer id="contact" class="py-12 relative z-10 border-t border-white/5 bg-[#020617]">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+                <p class="text-2xl font-bold text-white mb-2">Lilinyang.</p>
+                <p class="text-gray-500 text-sm">© 2026 All Rights Reserved.</p>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors text-2xl"><i class="ph ph-github-logo"></i></a>
+                <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors text-2xl"><i class="ph ph-twitter-logo"></i></a>
+                <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors text-2xl"><i class="ph ph-linkedin-logo"></i></a>
+                <a href="mailto:hello@example.com" class="text-gray-400 hover:text-blue-400 transition-colors text-2xl"><i class="ph ph-envelope-simple"></i></a>
+            </div>
         </div>
     </footer>
 
-    <button id="back-to-top" onclick="scrollToTop()" class="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-600/40 transition group">
-        <svg class="w-6 h-6 group-hover:-translate-y-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    <button id="back-to-top" class="fixed bottom-8 right-8 p-3 rounded-full btn-liquid text-white shadow-lg z-50">
+        <i class="ph ph-arrow-up text-xl"></i>
     </button>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // 1. 初始化动画
-        AOS.init({ once: true, offset: 100, easing: 'ease-out-cubic' });
+        // 1. 初始化 AOS 动画库
+        AOS.init({
+            once: true,
+            offset: 50,
+            duration: 800,
+        });
 
-        // 2. 语言切换
+        // 2. 深海液态干扰逻辑 (Liquid Interference)
+        const blobs = document.querySelectorAll('.blob');
+        
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            
+            // 获取窗口中心点
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            blobs.forEach((blob, index) => {
+                // 计算移动系数：不同层级的 blob 移动速度不同，制造视差
+                // index 0 (Blue): 移动最慢
+                // index 1 (Purple): 反向移动
+                // index 2 (Pink): 移动最快
+                const speed = (index + 1) * 0.03; 
+                const xOffset = (x - centerX) * speed;
+                const yOffset = (y - centerY) * speed;
+
+                // 如果是第二个 blob，我们让它反向移动，增加混沌感
+                const direction = index === 1 ? -1 : 1;
+
+                // 使用 transform 叠加（注意保留原有的 scale 效果需要 JS 动态计算比较复杂，
+                // 这里简单做 translate 偏移。如果 CSS animation 也在动 transform，可能会冲突。
+                // 解决方案：CSS 动画修改 top/left，JS 修改 transform，互不干扰。）
+                blob.style.transform = `translate(${xOffset * direction}px, ${yOffset * direction}px)`;
+            });
+        });
+
+        // 3. 语言切换逻辑
+        const langToggle = document.getElementById('lang-toggle');
+        const mobileLangToggle = document.getElementById('mobile-lang-toggle');
+        const body = document.body;
+
         function toggleLanguage() {
-            const body = document.body;
-            const btnText = document.getElementById('lang-btn-text');
             body.classList.toggle('english-mode');
-            btnText.innerText = body.classList.contains('english-mode') ? 'CN' : 'EN';
+            // 可以在这里添加保存到 localStorage 的逻辑
         }
 
-        // 3. 回到顶部显示控制
+        langToggle.addEventListener('click', toggleLanguage);
+        if(mobileLangToggle) mobileLangToggle.addEventListener('click', toggleLanguage);
+
+        // 4. 回到顶部按钮显隐
         const backToTopBtn = document.getElementById('back-to-top');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
@@ -343,38 +366,17 @@
                 backToTopBtn.classList.remove('show');
             }
         });
-
-        function scrollToTop() {
+        backToTopBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // --- 4. 鼠标液态干扰逻辑 (Parallax Interference) ---
-        const blobs = document.querySelectorAll('.blob');
-        let mouseX = 0;
-        let mouseY = 0;
-
-        // 监听鼠标位置
-        window.addEventListener('mousemove', (e) => {
-            // 计算鼠标相对于屏幕中心的坐标 (-1 到 1)
-            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
-            
-            requestAnimationFrame(updateBlobs);
         });
 
-        function updateBlobs() {
-            blobs.forEach((blob, index) => {
-                // 为每个光斑设置不同的干扰系数，制造层次感
-                const speed = (index + 1) * 30; 
-                
-                // 计算偏移量：鼠标往左，光斑往右（反向视差，像水流被推开）
-                const x = -mouseX * speed;
-                const y = -mouseY * speed;
-
-                // 应用变换：这里只改变 transform，不会打断 CSS 的 top/left 动画
-                blob.style.transform = `translate(${x}px, ${y}px) scale(${1 + Math.abs(mouseX) * 0.1})`;
-            });
-        }
+        // 5. 移动端菜单逻辑
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
     </script>
 </body>
 </html>
