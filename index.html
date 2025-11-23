@@ -76,48 +76,75 @@
 </style>
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans antialiased selection:bg-blue-500 selection:text-white">
-
-    <nav class="fixed w-full z-50 glass-nav border-b border-slate-800 transition-all duration-300">
+<nav class="fixed w-full z-50 glass-nav transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold tracking-tighter text-white">Lilinyang.</a>
-            <div class="hidden md:flex space-x-8 text-sm font-medium">
-                <a href="#about" class="hover:text-blue-400 transition">About</a>
-                <a href="#uiux" class="hover:text-blue-400 transition">UI/UX</a>
-                <a href="#branding" class="hover:text-blue-400 transition">Branding</a>
-                <a href="#media" class="hover:text-blue-400 transition">New Media</a>
-                <a href="#contact" class="px-5 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition shadow-lg shadow-blue-600/30">Contact</a>
+            <a href="#" class="text-2xl font-bold tracking-tighter text-white relative z-50">Lilinyang.</a>
+            
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex space-x-8 text-sm font-medium">
+                    <a href="#about" class="hover:text-blue-400 transition text-slate-300">
+                        <span lang="cn">关于</span><span lang="en">About</span>
+                    </a>
+                    <a href="#uiux" class="hover:text-blue-400 transition text-slate-300">
+                        <span lang="cn">作品</span><span lang="en">Works</span>
+                    </a>
+                    <a href="#contact" class="hover:text-blue-400 transition text-slate-300">
+                        <span lang="cn">联系</span><span lang="en">Contact</span>
+                    </a>
+                </div>
+                <button onclick="toggleLanguage()" class="text-xs font-bold border border-slate-600 px-3 py-1 rounded-full text-slate-400 hover:text-white hover:border-white transition uppercase">
+                    <span id="lang-btn-text">EN</span>
+                </button>
             </div>
         </div>
     </nav>
 
-    <section id="about" class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
-        <div class="absolute top-20 right-0 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse"></div>
-        <div class="absolute bottom-20 left-0 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-pulse"></div>
+    <section id="about" class="h-screen flex items-center justify-center relative overflow-hidden bg-slate-950">
+        
+        <canvas id="particle-canvas"></canvas>
+        
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-900/20 rounded-full blur-[100px] animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-900/20 rounded-full blur-[100px] animate-pulse" style="animation-delay: 1s;"></div>
 
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div data-aos="fade-right" data-aos-duration="1000">
-                <p class="text-blue-400 font-medium mb-4 tracking-widest">PORTFOLIO 2026</p>
-                <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6 text-white">
-                    Brand, Product & <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">New Media Designer</span>
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <div data-aos="fade-up" data-aos-duration="1000">
+                <p class="text-blue-500 font-medium mb-6 tracking-[0.2em] uppercase text-sm">
+                    <span lang="cn">2026 个人作品集</span><span lang="en">Portfolio 2026</span>
+                </p>
+                
+                <h1 class="text-5xl md:text-8xl font-bold leading-tight mb-8 text-white">
+                    <span lang="cn">品牌 · 产品 · 新媒体</span>
+                    <span lang="en">Brand · Product · New Media</span>
+                    <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                        <span lang="cn">数字设计</span><span lang="en">Digital Designer</span>
+                    </span>
                 </h1>
-                <div class="space-y-4 text-lg text-slate-400 mb-8 border-l-4 border-blue-500 pl-6">
-                    <p>🎓 澳门科技大学 / 人文艺术学院 / 硕士 (2024-2026)</p>
-                    <p>专注于品牌产品与新媒体方向。曾负责北方澳生之家品牌设计项目，熟练运用 Figma 及 AIGC 技术探索视觉可能。</p>
-                </div>
-                <div class="flex flex-wrap gap-4">
-                    <a href="#uiux" class="px-8 py-3 bg-white text-slate-900 font-bold rounded-full hover:scale-105 transition transform shadow-xl">View Works</a>
-                    <a href="mailto:940213696@qq.com" class="px-8 py-3 border border-slate-700 rounded-full hover:bg-slate-800 hover:border-slate-500 transition">Email Me</a>
-                </div>
-            </div>
-            <div class="relative group" data-aos="fade-left" data-aos-duration="1000">
-                <div class="relative z-10 w-full max-w-md mx-auto aspect-[3/4] bg-slate-800 rounded-2xl overflow-hidden shadow-2xl border border-slate-700 group-hover:border-blue-500/50 transition">
-                    <img src="avatar.png" alt="Li Linyang" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500 hover:scale-105">
+                
+                <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                    <span lang="cn">澳门科技大学硕士在读。专注于品牌重塑与 AIGC 视觉探索，致力于创造具有商业价值与艺术温度的数字体验。</span>
+                    <span lang="en">Master's student at M.U.S.T. Focusing on brand reshaping and AIGC visual exploration. Creating digital experiences with commercial value.</span>
+                </p>
+                
+                <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+                    <a href="#uiux" class="btn-liquid px-10 py-4 rounded-full text-white font-bold tracking-wide shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                        <span lang="cn">查看作品</span><span lang="en">View Works</span>
+                    </a>
+                    <a href="mailto:940213696@qq.com" class="btn-liquid px-10 py-4 rounded-full text-slate-300 hover:text-white">
+                        <span lang="cn">联系我</span><span lang="en">Email Me</span>
+                    </a>
                 </div>
             </div>
         </div>
+        
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-500 animate-bounce">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
     </section>
 
+    <button id="back-to-top" onclick="scrollToTop()" class="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-600/40 transition group">
+        <svg class="w-6 h-6 group-hover:-translate-y-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
     <section id="uiux" class="py-20 bg-slate-900">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-slate-800 pb-8">
