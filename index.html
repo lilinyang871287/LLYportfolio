@@ -6,14 +6,74 @@
     <title>李林阳 Lilinyang | Portfolio 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <style>
-        /* 自定义滚动条 */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
-        /* 玻璃拟态导航栏 */
-        .glass-nav { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); }
-    </style>
+<style>
+    /* 1. 全局滚动条美化 */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+
+    /* 2. 玻璃拟态导航栏 */
+    .glass-nav { 
+        background: rgba(2, 6, 23, 0.7); 
+        backdrop-filter: blur(12px); 
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* 3. 液态玻璃按钮 (Liquid Glass Button) */
+    .btn-liquid {
+        position: relative;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.5s ease;
+        z-index: 1;
+    }
+    .btn-liquid::before {
+        content: "";
+        position: absolute;
+        top: 0; left: -100%; width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+        z-index: -1;
+    }
+    .btn-liquid:hover {
+        border-color: rgba(59, 130, 246, 0.5);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        transform: translateY(-2px);
+    }
+    .btn-liquid:hover::before {
+        left: 100%;
+    }
+
+    /* 4. 回到顶部按钮 */
+    #back-to-top {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+    }
+    #back-to-top.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* 5. 中英文切换逻辑 */
+    /* 默认显示 CN，隐藏 EN */
+    [lang="en"] { display: none; }
+    /* 当 body 有 .english-mode 类时，隐藏 CN，显示 EN */
+    body.english-mode [lang="cn"] { display: none; }
+    body.english-mode [lang="en"] { display: inline-block; }
+    
+    /* 粒子画布层级 */
+    #particle-canvas {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 0;
+        pointer-events: none; /* 让鼠标能穿过画布点击按钮 */
+    }
+</style>
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans antialiased selection:bg-blue-500 selection:text-white">
 
