@@ -478,6 +478,18 @@
         // ==========================================
         const grid = document.getElementById('projects-grid');
 
+        // 🔴 修复后的图片加载错误处理函数
+        window.handleImgError = function(img, title) {
+            img.style.display = 'none';
+            const parent = img.parentNode;
+            parent.innerHTML = `
+                <div class="fallback-placeholder">
+                    <i class="ph ph-image text-4xl mb-2"></i>
+                    <span>${title}</span>
+                </div>
+            `;
+        };
+
         function renderProjects(filter = 'all') {
             grid.innerHTML = ''; // 清空
             
@@ -493,9 +505,10 @@
                     if(p.category === 'AI & IP') colorClass = 'text-purple-400 border-purple-400/30';
                     if(p.category === 'New Media') colorClass = 'text-red-400 border-red-400/30';
 
+                    // 🔴 修复：使用函数调用代替内联 JS 字符串拼接，彻底根治 SyntaxError
                     card.innerHTML = `
                         <div class="img-container">
-                            <img src="${p.img}" onerror="this.style.display='none';this.parentNode.innerHTML='<div class=\\'fallback-placeholder\\'><i class=\\'ph ph-image text-4xl mb-2\\'></i><span>${p.titleEN}</span></div>'" alt="${p.titleEN}">
+                            <img src="${p.img}" onerror="handleImgError(this, '${p.titleEN}')" alt="${p.titleEN}">
                         </div>
                         <div class="p-6">
                             <div class="mb-3 flex gap-2">
