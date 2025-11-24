@@ -101,12 +101,29 @@
             height: 100%; width: 100%; color: #475569; background: linear-gradient(45deg, #0f172a, #1e293b);
         }
         
-        /* 隐藏滚动条 */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
-</head>
-<body class="cn-mode selection:bg-emerald-500 selection:text-white no-scrollbar">
+        /* --- 8. 滚动条美化 --- */
+/* 滚动条整体 */
+::-webkit-scrollbar {
+    width: 10px;               /* 竖向滚动条宽度 */
+    height: 10px;              /* 横向滚动条高度 */
+}
+
+/* 滚动条轨道（背景）：设置为你的网页底色 #000509 */
+::-webkit-scrollbar-track {
+    background: #000509; 
+}
+
+/* 滚动条滑块：设置为深灰色，带圆角 */
+::-webkit-scrollbar-thumb {
+    background: #1e293b;       /* 深灰 (Slate-800) */
+    border-radius: 5px;        /* 圆角 */
+    border: 2px solid #000509; /* 加上边框让滑块看起来有一点“悬浮感” */
+}
+
+/* 鼠标悬停在滑块上时：变亮一点 */
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;       /* 亮灰 (Slate-600) */
+}
 
     <!-- 🌌 背景：更新为蓝绿极光色系 -->
     <canvas id="canvas-bg"></canvas>
