@@ -4,451 +4,375 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>李林阳 Lilinyang | Portfolio 2026</title>
-    
+    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 AOS 动画库 -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
     <style>
-        /* --- 1. 全局设置 --- */
-        body { 
-            background-color: #000509; /* 更深邃的黑蓝底色 */
-            color: #e2e8f0; 
-            overflow-x: hidden; 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        /* --- 1. 基础设置 --- */
+        body { background-color: #020617; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+
+        /* --- 2. 玻璃导航栏 --- */
+        .glass-nav { 
+            background: rgba(2, 6, 23, 0.7); 
+            backdrop-filter: blur(12px); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        /* --- 2. Canvas 背景层 --- */
-        #canvas-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+        /* --- 3. 液态玻璃按钮 --- */
+        .btn-liquid {
+            position: relative; overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease; z-index: 1;
+        }
+        .btn-liquid::before {
+            content: ""; position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease; z-index: -1;
+        }
+        .btn-liquid:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-liquid:hover::before { left: 100%; }
+
+        /* --- 4. 回到顶部按钮 --- */
+        #back-to-top {
+            opacity: 0; visibility: hidden;
+            transform: translateY(20px); transition: all 0.4s ease;
+        }
+        #back-to-top.show {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+
+        /* --- 5. 中英文切换 --- */
+        [lang="en"] { display: none; }
+        body.english-mode [lang="cn"] { display: none !important; }
+        body.english-mode [lang="en"] { display: inline-block !important; }
+
+        /* --- 6. 极光流光背景动画 (加速+液态干扰版) --- */
+        .aurora-bg {
+            position: absolute; inset: 0; overflow: hidden; z-index: 0;
+            background: #020617;
+        }
+        /* 黑框遮罩：压暗四周，形成聚光灯效果 */
+        .aurora-bg::after {
+            content: ""; position: absolute; inset: 0; z-index: 1;
+            background: radial-gradient(ellipse at center, transparent 20%, #020617 85%);
             pointer-events: none;
         }
 
-        /* --- 3. 双语切换 --- */
-        [lang="en"] { display: none; }
-        body.en-mode [lang="cn"] { display: none !important; }
-        body.en-mode [lang="en"] { display: block !important; }
-        body.en-mode span[lang="en"] { display: inline !important; }
-        span[lang="cn"] { display: inline; }
-
-        /* --- 4. 玻璃拟态 --- */
-        .glass-nav {
-            background: rgba(0, 5, 9, 0.6); /* 配合新底色调整透明度 */
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        .blob {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.6;
+            mix-blend-mode: screen;
+            /* 关键：让鼠标干扰时的移动像水一样顺滑 */
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
+
+        /* 动画改为 top/left 移动，腾出 transform 给 JS 鼠标交互用 */
+        /* 速度已调整：10s-15s，比之前的 30s 快了一倍多 */
+        .blob-1 {
+            width: 40vw; height: 40vw; background: #3b82f6; /* 蓝 */
+            animation: wander-pos-1 12s infinite alternate ease-in-out;
+        }
+        .blob-2 {
+            width: 45vw; height: 45vw; background: #7c3aed; /* 紫 */
+            animation: wander-pos-2 15s infinite alternate-reverse ease-in-out;
+        }
+        .blob-3 {
+            width: 30vw; height: 30vw; background: #be185d; /* 粉 */
+            opacity: 0.5;
+            animation: wander-pos-3 10s infinite alternate ease-in-out;
+        }
+
+        @keyframes wander-pos-1 {
+            0% { top: 10%; left: 10%; }
+            100% { top: 40%; left: 50%; }
+        }
+        @keyframes wander-pos-2 {
+            0% { bottom: 10%; right: 10%; }
+            100% { bottom: 40%; right: 40%; }
+        }
+        @keyframes wander-pos-3 {
+            0% { top: 40%; left: 40%; width: 30vw; }
+            100% { top: 50%; left: 50%; width: 45vw; } 
+        }
+
+        /* --- 7. 作品卡片样式优化 --- */
+        .project-card {
+            background: #0f172a; /* 卡片底色 */
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        .project-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-5px);
+        }
+        /* 图片容器 */
+        .card-img-box {
             overflow: hidden;
-            cursor: pointer;
-        }
-        
-        .glass-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(16, 185, 129, 0.3); /* 呼应背景的绿色 */
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
-        }
-
-        /* --- 5. 巨型标题发光特效 (复刻图片核心) --- */
-        .glow-text {
-            text-shadow: 
-                0 0 40px rgba(16, 185, 129, 0.3), /* 绿色光晕 */
-                0 0 80px rgba(6, 182, 212, 0.2);  /* 青色光晕 */
-        }
-
-        /* --- 6. 图片容器 --- */
-        .img-container {
-            width: 100%;
-            height: 240px;
-            overflow: hidden;
-            background: #0f172a;
             position: relative;
         }
-        .img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s ease;
+        .card-img-box img {
+            transition: transform 0.7s ease;
         }
-        .glass-card:hover .img-container img { transform: scale(1.08); }
-
-        /* --- 7. 筛选按钮 --- */
-        .filter-btn {
-            border: 1px solid rgba(255,255,255,0.1);
-            color: #94a3b8;
-            transition: all 0.3s;
-            background: transparent;
+        /* 悬停时图片只放大，不变暗 */
+        .project-card:hover .card-img-box img {
+            transform: scale(1.05);
         }
-        .filter-btn:hover, .filter-btn.active {
-            background: rgba(16, 185, 129, 0.1); /* 绿色高亮 */
-            border-color: #10b981;
+        /* 筛选按钮样式 */
+        .filter-btn.active {
+            background-color: #3b82f6;
             color: white;
+            border-color: #3b82f6;
         }
-
-        .fallback-placeholder {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100%; width: 100%; color: #475569; background: linear-gradient(45deg, #0f172a, #1e293b);
-        }
-        
-        /* 隐藏滚动条 */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="cn-mode selection:bg-emerald-500 selection:text-white">
+<body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
 
-    <!-- 🌌 背景：更新为蓝绿极光色系 -->
-    <canvas id="canvas-bg"></canvas>
-
-    <!-- 导航栏 (保留原样) -->
+    <!-- 导航栏 -->
     <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-xl font-bold text-white flex items-center gap-2 tracking-wider group">
-                <i class="ph ph-asterisk-simple text-emerald-400 group-hover:rotate-180 transition-transform duration-700"></i> 
-                Lilinyang.
-            </a>
-            
+            <a href="#" class="text-2xl font-bold tracking-tighter text-white relative z-50">Lilinyang.</a>
             <div class="flex items-center gap-6">
-                <div class="hidden md:flex space-x-8 text-sm text-gray-300 font-medium">
-                    <a href="#about" class="hover:text-emerald-400 transition"><span lang="cn">关于</span><span lang="en">About</span></a>
-                    <a href="#projects" class="hover:text-emerald-400 transition"><span lang="cn">作品</span><span lang="en">Work</span></a>
-                    <a href="#contact" class="hover:text-emerald-400 transition"><span lang="cn">联系</span><span lang="en">Contact</span></a>
+                <div class="hidden md:flex space-x-8 text-sm font-medium">
+                    <a href="#about" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">关于</span><span lang="en">About</span></a>
+                    <a href="#uiux" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">作品</span><span lang="en">Works</span></a>
+                    <a href="#contact" class="hover:text-blue-400 transition text-slate-300"><span lang="cn">联系</span><span lang="en">Contact</span></a>
                 </div>
-                <button id="lang-btn" class="flex items-center gap-2 text-xs border border-gray-600 px-4 py-1.5 rounded-full hover:border-emerald-400 hover:text-emerald-400 transition font-mono bg-white/5">
-                    <i class="ph ph-translate"></i>
-                    <span class="font-bold" id="lang-text">CN / EN</span>
+                <button onclick="toggleLanguage()" class="text-xs font-bold border border-slate-600 px-3 py-1 rounded-full text-slate-400 hover:text-white hover:border-white transition uppercase">
+                    <span id="lang-btn-text">EN</span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- 🌟 新版 Hero 首屏 (复刻图片布局) -->
-    <section class="h-screen w-full flex flex-col justify-between pt-24 pb-10 px-6 md:px-12 relative overflow-hidden">
+    <!-- Hero 区域 (pb-32 防止内容沉底) -->
+    <section id="about" class="h-screen flex items-center justify-center relative overflow-hidden bg-slate-950 pb-32">
         
-        <!-- 中间：巨型 Portfolio 文字 -->
-        <div class="flex-1 flex items-center justify-center z-10" data-aos="zoom-out" data-aos-duration="1500">
-            <!-- 使用 vw 单位确保文字永远撑满屏幕宽度 -->
-            <h1 class="font-sans font-bold text-white leading-none tracking-tighter glow-text select-none mix-blend-overlay md:mix-blend-normal text-[19vw] md:text-[18vw]">
-                Portfolio
-            </h1>
+        <!-- 流光背景层 (无白点) -->
+        <div class="aurora-bg">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
         </div>
 
-        <!-- 底部信息栏 (Grid 布局复刻原图) -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 z-20 text-sm font-light text-gray-300 items-end">
-            
-            <!-- 左侧：个人信息 -->
-            <div class="md:col-span-4 space-y-4" data-aos="fade-up" data-aos-delay="200">
-                <div>
-                    <p class="text-white font-medium text-lg block mb-1">@李林阳</p>
-                    <p class="opacity-70">Lilinyang</p>
-                </div>
-                <div class="flex flex-col gap-1">
-                    <p class="uppercase tracking-wider text-xs opacity-50">Telephone</p>
-                    <p class="font-mono text-emerald-300">+86 17707373986</p>
-                </div>
-                <div class="flex flex-col gap-1">
-                    <p class="uppercase tracking-wider text-xs opacity-50">Mail</p>
-                    <p class="font-mono text-emerald-300">940213696@qq.com</p>
-                </div>
-            </div>
-
-            <!-- 中间留空 (占据空间) -->
-            <div class="hidden md:block md:col-span-4"></div>
-
-            <!-- 右侧：年份与标签 -->
-            <div class="md:col-span-4 flex flex-col md:items-end justify-end gap-4" data-aos="fade-up" data-aos-delay="400">
-                <p class="text-right opacity-80 hidden md:block tracking-widest">个人作品集</p>
-                <div class="flex items-baseline gap-2">
-                    <span class="text-4xl md:text-6xl font-light tracking-tight">© 2026</span>
+        <!-- 内容层 -->
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <div data-aos="fade-up" data-aos-duration="1000">
+                <p class="text-blue-400 font-medium mb-6 tracking-[0.3em] uppercase text-sm">
+                    <span lang="cn">2026 个人作品集</span><span lang="en">Portfolio 2026</span>
+                </p>
+                
+                <h1 class="text-5xl md:text-8xl font-bold leading-tight mb-8 text-white drop-shadow-lg">
+                    <span lang="cn">品牌 · 产品 · 新媒体</span>
+                    <span lang="en">Brand · Product · New Media</span>
+                    <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                        <span lang="cn">数字设计</span><span lang="en">Digital Designer</span>
+                    </span>
+                </h1>
+                
+                <p class="text-lg md:text-xl text-slate-300 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
+                    <span lang="cn">澳门科技大学硕士在读。专注于品牌重塑与 AIGC 视觉探索，致力于创造具有商业价值与艺术温度的数字体验。</span>
+                    <span lang="en">Master's student at M.U.S.T. Focusing on brand reshaping and AIGC visual exploration. Creating digital experiences with commercial value.</span>
+                </p>
+                
+                <!-- 单按钮 -->
+                <div class="flex justify-center items-center">
+                    <a href="#uiux" class="btn-liquid px-12 py-4 rounded-full text-white font-bold tracking-wide shadow-[0_0_20px_rgba(59,130,246,0.6)] hover:scale-105 transform transition">
+                        <span lang="cn">查看作品</span><span lang="en">View Works</span>
+                    </a>
                 </div>
             </div>
         </div>
-
-        <!-- 装饰性光点 (模拟图片中 "i" 上面的那个光点) -->
-        <div class="absolute top-[25%] right-[15%] w-4 h-4 bg-white rounded-full blur-[2px] animate-pulse opacity-80 z-0 hidden md:block"></div>
+        
+        <!-- 向下箭头 (bottom-4 贴底) -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-slate-500 animate-bounce z-20 pointer-events-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
     </section>
 
     <!-- 作品展示区域 -->
-    <section id="projects" class="py-24 relative z-10 bg-[#000509]">
+    <section id="uiux" class="py-20 bg-slate-950 relative z-10">
         <div class="container mx-auto px-6">
-            <div class="text-center mb-16" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-8 tracking-tight"><span lang="cn">精选项目</span><span lang="en">Selected Projects</span></h2>
-                
-                <div class="flex flex-wrap justify-center gap-3" id="filter-container">
-                    <button class="filter-btn active px-6 py-2 rounded-full text-sm tracking-wider" data-filter="all">
-                        <span lang="cn">全部</span><span lang="en">All</span>
-                    </button>
-                    <button class="filter-btn px-6 py-2 rounded-full text-sm tracking-wider" data-filter="UI/UX">
-                        <span lang="cn">界面设计</span><span lang="en">UI/UX</span>
-                    </button>
-                    <button class="filter-btn px-6 py-2 rounded-full text-sm tracking-wider" data-filter="Branding">
-                        <span lang="cn">品牌视觉</span><span lang="en">Branding</span>
-                    </button>
-                    <button class="filter-btn px-6 py-2 rounded-full text-sm tracking-wider" data-filter="Product">
-                        <span lang="cn">产品文创</span><span lang="en">Product</span>
-                    </button>
-                    <button class="filter-btn px-6 py-2 rounded-full text-sm tracking-wider" data-filter="New Media">
-                        <span lang="cn">新媒体</span><span lang="en">New Media</span>
-                    </button>
-                    <button class="filter-btn px-6 py-2 rounded-full text-sm tracking-wider" data-filter="AI & IP">
-                        <span lang="cn">AI与IP</span><span lang="en">AI & IP</span>
-                    </button>
+            
+            <!-- 顶部筛选栏 -->
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-slate-800 pb-8" data-aos="fade-up">
+                <div>
+                    <h2 class="text-4xl font-bold text-white mb-2">
+                        <span lang="cn">精选项目</span><span lang="en">Selected Works</span>
+                    </h2>
+                    <p class="text-slate-500"><span lang="cn">UI/UX · 品牌 · 产品 · AIGC</span><span lang="en">UI/UX · Branding · Product · AIGC</span></p>
+                </div>
+                <!-- 筛选按钮组 -->
+                <div class="flex flex-wrap gap-3 mt-6 md:mt-0" id="filters">
+                    <button class="filter-btn active border border-slate-700 px-4 py-1 rounded-full text-sm text-slate-400 hover:text-white transition" data-filter="all">All</button>
+                    <button class="filter-btn border border-slate-700 px-4 py-1 rounded-full text-sm text-slate-400 hover:text-white transition" data-filter="UI/UX">UI/UX</button>
+                    <button class="filter-btn border border-slate-700 px-4 py-1 rounded-full text-sm text-slate-400 hover:text-white transition" data-filter="Branding">Branding</button>
+                    <button class="filter-btn border border-slate-700 px-4 py-1 rounded-full text-sm text-slate-400 hover:text-white transition" data-filter="Product">Product</button>
+                    <button class="filter-btn border border-slate-700 px-4 py-1 rounded-full text-sm text-slate-400 hover:text-white transition" data-filter="AI">AI & Media</button>
                 </div>
             </div>
 
-            <!-- 项目网格 -->
-            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- JS 填充 -->
+            <!-- 瀑布流布局 (Masonry) -->
+            <div id="projects-grid" class="columns-1 md:columns-2 lg:columns-3 gap-8 space-y-8">
+                <!-- JS 将自动填充卡片 -->
             </div>
+
         </div>
     </section>
 
-    <!-- 关于/技能 (样式微调适配新主题) -->
-    <section id="about" class="py-24 relative z-10">
-        <div class="absolute inset-0 bg-gradient-to-b from-[#000509] via-[#064e3b20] to-[#000509] -z-10 h-full"></div>
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold text-white mb-12 text-center" data-aos="fade-up"><span lang="cn">专业技能</span><span lang="en">Skills & Tools</span></h2>
-            <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto text-sm" data-aos="fade-up">
-                <div class="p-[1px] rounded-full bg-gradient-to-r from-emerald-500 to-teal-500">
-                    <span class="block px-6 py-2 bg-[#000509] rounded-full text-white">Figma (UI/UX)</span>
-                </div>
-                <span class="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">Photoshop</span>
-                <span class="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">Illustrator</span>
-                <span class="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">Blender / Rhino 3D</span>
-                <span class="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">After Effects</span>
-                <div class="p-[1px] rounded-full bg-gradient-to-r from-teal-500 to-cyan-500">
-                    <span class="block px-6 py-2 bg-[#000509] rounded-full text-white">AIGC (Midjourney/GPT)</span>
-                </div>
-                <span class="px-6 py-2 bg-white/5 border border-white/10 rounded-full text-gray-300">New Media Ops</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- 底部 -->
-    <footer id="contact" class="py-16 border-t border-white/5 bg-[#000509] relative z-20">
-        <div class="container mx-auto px-6 text-center" data-aos="fade-up">
-            <p class="text-3xl font-bold text-white mb-10"><span lang="cn">保持联系</span><span lang="en">Let's Connect</span></p>
-            <div class="flex flex-col md:flex-row justify-center gap-6 mb-10">
-                <a href="mailto:940213696@qq.com" class="group flex items-center justify-center gap-3 text-gray-300 hover:text-white transition bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/10 px-8 py-4 rounded-2xl">
-                    <i class="ph ph-envelope-simple text-2xl text-emerald-400 group-hover:scale-110 transition-transform"></i> 
-                    <span class="font-mono">940213696@qq.com</span>
+    <!-- 底部联系区 -->
+    <footer id="contact" class="py-24 bg-slate-950 border-t border-slate-900 text-center relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-8" data-aos="fade-up">Let's Create Together.</h2>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-6" data-aos="fade-up" data-aos-delay="100">
+                <a href="tel:+8617707373986" class="flex items-center space-x-3 text-slate-400 hover:text-white transition group">
+                    <span class="p-3 bg-slate-800 rounded-full group-hover:bg-blue-600 transition">📞</span>
+                    <span class="text-xl">+86 17707373986</span>
                 </a>
-                <a href="tel:+8617707373986" class="group flex items-center justify-center gap-3 text-gray-300 hover:text-white transition bg-white/5 border border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/10 px-8 py-4 rounded-2xl">
-                    <i class="ph ph-phone text-2xl text-cyan-400 group-hover:scale-110 transition-transform"></i> 
-                    <span class="font-mono">+86 17707373986</span>
+                <span class="hidden md:block text-slate-700">|</span>
+                <a href="mailto:940213696@qq.com" class="flex items-center space-x-3 text-slate-400 hover:text-white transition group">
+                    <span class="p-3 bg-slate-800 rounded-full group-hover:bg-blue-600 transition">📧</span>
+                    <span class="text-xl">940213696@qq.com</span>
                 </a>
             </div>
-            <p class="text-gray-600 text-xs tracking-widest uppercase">© 2026 Lilinyang.</p>
+            <p class="mt-16 text-xs text-slate-700">© 2026 Lilinyang Portfolio. Built with GitHub & Tailwind.</p>
         </div>
     </footer>
 
-    <!-- 🔴 超宽屏灯箱 (保持不变) -->
-    <div id="project-modal" class="fixed inset-0 z-[100] hidden flex justify-center items-center p-2 md:p-4 backdrop-blur-xl bg-black/90 transition-opacity duration-300 opacity-0 pointer-events-none">
-        <div class="relative w-full max-w-[90vw] h-[95vh] bg-[#0f172a] rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-white/10 transform scale-95 transition-transform duration-300" id="modal-content">
-            <div class="flex-none p-5 border-b border-white/10 bg-[#0f172a] z-20 flex justify-between items-center">
-                <div>
-                    <h3 id="modal-title" class="text-xl md:text-2xl font-bold text-white">Project Title</h3>
-                    <p id="modal-desc" class="text-blue-400 text-sm mt-1 font-mono">Description</p>
-                </div>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-white hover:bg-white/10 rounded-full p-2 transition"><i class="ph ph-x text-2xl"></i></button>
-            </div>
-            <div class="flex-1 overflow-y-auto bg-[#000509] no-scrollbar relative text-center">
-                <img id="modal-img" src="" class="w-full h-auto block mx-auto cursor-zoom-in hover:opacity-95 transition shadow-2xl" 
-                     alt="Project Detail" title="Click to view full size" onclick="window.open(this.src, '_blank');">
-                <div class="py-16"><p class="text-gray-600 text-xs uppercase tracking-[0.2em]"><span lang="cn">展示结束</span><span lang="en">End of Presentation</span></p></div>
-            </div>
-        </div>
-    </div>
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" onclick="scrollToTop()" class="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full shadow-lg shadow-blue-600/40 transition group">
+        <svg class="w-6 h-6 group-hover:-translate-y-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
 
     <!-- 脚本区 -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // ==========================================
-        // 1. 项目数据 (保持不变)
-        // ==========================================
-        const projectsData = [
-            { id: 1, category: "UI/UX", year: "2025", img: "p1-maisc.png", titleCN: "澳门人工智能超算中心", titleEN: "Macau AI Supercomputing Center", descCN: "以“莲花”与“运算”为核心理念，构建区域性AI创新枢纽平台的可信数据空间。", descEN: "Trusted data space design inspired by 'Lotus' and 'Computing' concepts." },
-            { id: 2, category: "Product", year: "2024", img: "p2-seal.png", titleCN: "印迹·澳门火漆印章", titleEN: "Macao Imprint: Wax Seal", descCN: "灵感源自葡式碎石路，六边形与不规则石砖结合，记录澳门历史印迹。", descEN: "Inspired by Portuguese pavement patterns. Interlocking hexagonal designs." },
-            { id: 3, category: "Branding", year: "2025", img: "p3-kombucha.png", titleCN: "澳门康普茶包装设计", titleEN: "Macau Kombucha Packaging", descCN: "融合澳门地图纹理与地标元素，桃子姜、咖啡柚子多口味系列设计。", descEN: "Integrating Macau map textures and landmarks into beverage packaging." },
-            { id: 4, category: "New Media", year: "2024", img: "p4-media.png", titleCN: "小红书·匠心荟澳", titleEN: "Jiangxin Huiao Operations", descCN: "国家艺术基金项目官方运营。管理8人团队，发布62篇笔记，累计阅读43W+。", descEN: "National Arts Fund project ops. Managed team, 62 posts, 430k+ reads." },
-            { id: 5, category: "AI & IP", year: "2025", img: "p5-ai-video.png", titleCN: "AI短片《三羊开泰》", titleEN: "AI Film: Three Rams", descCN: "全流程AI创作（GPT4o剧本+Midjourney绘图+Suno音乐），诠释“阳气动则万物生”。", descEN: "Full AI workflow: Script, Visuals, Music. Interpreting traditional culture." },
-            { id: 6, category: "Branding", year: "2025", img: "p6-susgru.png", titleCN: "磐山鹤 SUSGRU", titleEN: "SUSGRU Outdoor Brand", descCN: "“生于磐石，鹤乘风起”。结合宋体与现代黑体设计的户外品牌视觉。", descEN: "Outdoor brand identity. 'Rooted in rock, soaring like a crane.'" },
-            { id: 7, category: "Product", year: "2025", img: "p7-book.png", titleCN: "《暗河》诗集装帧", titleEN: "Underground River Poetry", descCN: "许立志诗集再版。裸背锁线装订，黑色基调隐喻流水线工人的心声。", descEN: "Naked spine binding design, reflecting the silent cry of workers." },
-            { id: 8, category: "Product", year: "2025", img: "p8-merch.png", titleCN: "澳科大文创周边", titleEN: "M.U.S.T. Merchandise", descCN: "帆布袋、T恤、冰箱贴全案设计。独立完成从构思到厂家对接落地。", descEN: "Tote bag, T-shirt, Magnet design. Concept to production execution." },
-            { id: 9, category: "Branding", year: "2025", img: "p9-power13.png", titleCN: "Power13 运动饮料", titleEN: "Power13 Sports Drink", descCN: "结合墨西哥“亡灵节”文化元素，打造自然纯粹的运动饮品视觉。", descEN: "Combining 'Day of the Dead' elements for a pure sports drink visual." },
-            { id: 10, category: "Branding", year: "2024", img: "p10-buttercake.png", titleCN: "金燕西洋牛油糕", titleEN: "Kam In Butter Cake", descCN: "澳门非遗品牌。提取葡式花纹、海洋文化与博彩文化，三语排版。", descEN: "Heritage brand packaging. Portuguese patterns & trilingual layout." },
-            { id: 11, category: "AI & IP", year: "2024", img: "p11-therapy.png", titleCN: "AI绘画艺术疗愈", titleEN: "AI Art Therapy", descCN: "人工智能协同绘画体验课程。利用“绘愈之境”培养特殊教育儿童创造力。", descEN: "AI collaborative painting course for special education children." },
-            { id: 12, category: "Branding", year: "2022", img: "p12-logo.png", titleCN: "澳生之家青年社区", titleEN: "Macau Student Home", descCN: "Logo设计一等奖。莲花（澳门）与房屋（家）结合，寓意温馨基地。", descEN: "1st Prize Logo. Combining Lotus (Macau) and House concepts." },
-            { id: 13, category: "New Media", year: "2025", img: "p13-passhk.png", titleCN: "小红书·Pass记港办", titleEN: "Pass HK Operations", descCN: "从0到1搭建私域。月发布37篇，0投流自然增粉。", descEN: "Built private traffic from scratch. Organic growth without ads." },
-            { id: 14, category: "Product", year: "2024", img: "p14-prince.png", titleCN: "《小王子》再版设计", titleEN: "Le Petit Prince Re-edition", descCN: "基于几何图形的视觉重构。手工裸背锁线装帧，方形开本。", descEN: "Visual reconstruction based on geometric shapes. Handmade binding." },
-            { id: 15, category: "Branding", year: "2025", img: "p15-poster.png", titleCN: "西安面馆·商业海报", titleEN: "Xi'an Noodle Poster", descCN: "高饱和度视觉冲击，层级分明的信息编排，传递“正宗风味”卖点。", descEN: "High saturation visual impact, conveying 'Authentic Flavor'." },
-            { id: 16, category: "Branding", year: "2022", img: "p16-font.png", titleCN: "黑圆楷·字体设计", titleEN: "Black Round Kai Font", descCN: "保留传统楷体特点，融合现代黑粗体风韵。方正字体大赛入围奖。", descEN: "Mixing traditional Kai with modern bold styles. Award Finalist." },
-            { id: 17, category: "Product", year: "2022", img: "p17-stamp.png", titleCN: "澳门永利·冬奥邮票", titleEN: "Winter Olympics Stamps", descCN: "融合澳门旅游塔、大三巴剪影与冬奥运动。设计比赛入围奖。", descEN: "Merging Macau Tower & St. Paul's with winter sports visuals." },
-            { id: 18, category: "AI & IP", year: "2023", img: "p18-nft.png", titleCN: "鱼鱼鱼 NFT", titleEN: "Fish Fish Fish NFT", descCN: "基于元宇宙概念的数字鱼IP。绘制120个NFT，涵盖4个稀有等级。", descEN: "Digital Fish IP for Metaverse. 120 NFTs across 4 rarity tiers." }
+        // --- 1. 项目数据 (包含所有18个项目) ---
+        const projects = [
+            { id: 1, tag: "UI/UX", img: "2.png", titleCN: "澳门人工智能超算中心", titleEN: "MAISC Supercomputing Center", descCN: "打造区域性AI创新枢纽平台的可信数据空间。包含PC与移动端双语交互设计。", descEN: "Trusted data space for regional AI hub. Bilingual web & mobile design." },
+            { id: 2, tag: "Product", img: "https://via.placeholder.com/800x450/e2e8f0/475569?text=Wax+Seal", titleCN: "印迹·澳门火漆印章", titleEN: "Macao Imprint Wax Seal", descCN: "灵感源自葡式碎石路，六边形与不规则石砖结合，记录澳门历史印迹。", descEN: "Inspired by Portuguese pavement. Hexagonal interlocking design." },
+            { id: 3, tag: "Branding", img: "https://via.placeholder.com/600x750/fca5a5/991b1b?text=Kombucha", titleCN: "澳门康普茶包装设计", titleEN: "Macau Kombucha Packaging", descCN: "融合澳门地图纹理与地标元素，桃子姜、咖啡柚子多口味系列设计。", descEN: "Integrating Macau map textures and landmarks into beverage packaging." },
+            { id: 4, tag: "AI", img: "https://via.placeholder.com/800x450/3b82f6/ffffff?text=Three+Rams", titleCN: "AI实验短片《三羊开泰》", titleEN: "AI Film: Three Rams", descCN: "全流程AI创作（GPT剧本+MJ绘图+Suno音乐），诠释传统文化新表达。", descEN: "Full AI workflow: Script, Visuals, Music. Reinterpreting tradition." },
+            { id: 5, tag: "Branding", img: "https://via.placeholder.com/600x600/171717/e5e5e5?text=Power13", titleCN: "Power13 运动饮料", titleEN: "Power13 Sports Drink", descCN: "结合墨西哥“亡灵节”文化元素，打造自然纯粹的运动饮品视觉。", descEN: "Combining 'Day of the Dead' elements for a pure sports drink visual." },
+            { id: 6, tag: "Branding", img: "https://via.placeholder.com/600x800/b91c1c/fcd34d?text=Butter+Cake", titleCN: "金燕西洋牛油糕", titleEN: "Kam In Butter Cake", descCN: "百年老字号品牌重塑，融合葡式花纹与澳门海洋文化，三语排版。", descEN: "Heritage brand rebranding. Portuguese patterns & trilingual layout." },
+            { id: 7, tag: "Product", img: "https://via.placeholder.com/600x600/ffffff/000000?text=MUST+Merch", titleCN: "澳科大 25周年文创", titleEN: "M.U.S.T. Merchandise", descCN: "帆布袋、T恤、冰箱贴全案设计。独立完成从构思到落地。", descEN: "Tote bag, T-shirt, Magnet design. Concept to production." },
+            { id: 8, tag: "AI", img: "https://via.placeholder.com/600x600/14b8a6/ccfbf1?text=Fish+NFT", titleCN: "鱼鱼鱼 NFT", titleEN: "Fish Fish Fish NFT", descCN: "基于元宇宙概念的数字鱼IP。绘制120个NFT，涵盖4个稀有等级。", descEN: "Digital Fish IP for Metaverse. 120 NFTs across 4 rarity tiers." },
+            { id: 9, tag: "Branding", img: "https://via.placeholder.com/600x400/ffffff/000000?text=SUSGRU", titleCN: "磐山鹤 SUSGRU", titleEN: "SUSGRU Outdoor Brand", descCN: "“生于磐石，鹤乘风起”。结合宋体与现代黑体设计的户外品牌视觉。", descEN: "Outdoor brand identity. 'Rooted in rock, soaring like a crane'." },
+            { id: 10, tag: "AI", img: "https://via.placeholder.com/800x600/ec4899/fce7f3?text=Xiaohongshu", titleCN: "新媒体·匠心荟澳", titleEN: "Jiangxin Huiao Media", descCN: "国家艺术基金项目官方运营。从0到1搭建，累计阅读43W+。", descEN: "Project operations. Built from scratch, 430k+ reads." },
+            { id: 11, tag: "Product", img: "https://via.placeholder.com/600x800/000000/333333?text=Book", titleCN: "《暗河》诗集装帧", titleEN: "Underground River Book", descCN: "许立志诗集再版。裸背锁线装订，黑色基调隐喻流水线工人的心声。", descEN: "Naked spine binding design, reflecting the silent cry of workers." },
+            { id: 12, tag: "Product", img: "https://via.placeholder.com/600x600/3b82f6/93c5fd?text=Prince", titleCN: "《小王子》再版设计", titleEN: "Le Petit Prince Design", descCN: "基于几何图形的视觉重构。手工裸背锁线装帧，方形开本。", descEN: "Visual reconstruction based on geometric shapes. Handmade binding." },
+            { id: 13, tag: "Branding", img: "https://via.placeholder.com/600x400/22c55e/f0fdf4?text=Student+Home", titleCN: "澳生之家 Logo", titleEN: "Macau Student Home", descCN: "Logo设计一等奖。莲花与房屋结合，寓意温馨基地。", descEN: "1st Prize Logo. Combining Lotus and House concepts." },
+            { id: 14, tag: "AI", img: "https://via.placeholder.com/800x600/a855f7/f3e8ff?text=Art+Therapy", titleCN: "AI 艺术疗愈", titleEN: "AI Art Therapy", descCN: "人工智能协同绘画体验课程。利用AI工具培养特殊儿童创造力。", descEN: "AI collaborative painting course for special education." },
+            { id: 15, tag: "AI", img: "https://via.placeholder.com/600x800/f59e0b/fef3c7?text=PassHK", titleCN: "小红书·Pass记港办", titleEN: "Pass HK Operations", descCN: "私域流量搭建。月发布37篇笔记，自然增粉无投流。", descEN: "Private traffic building. Organic growth without ads." },
+            { id: 16, tag: "Branding", img: "https://via.placeholder.com/600x800/ef4444/fee2e2?text=Poster", titleCN: "西安面馆海报", titleEN: "Xi'an Noodle Poster", descCN: "高饱和度视觉冲击，层级分明的信息编排，传递正宗风味。", descEN: "High saturation visual impact, conveying authentic flavor." },
+            { id: 17, tag: "Product", img: "https://via.placeholder.com/800x400/6366f1/e0e7ff?text=Stamps", titleCN: "冬奥纪念邮票", titleEN: "Winter Olympics Stamps", descCN: "融合澳门旅游塔、大三巴剪影与冬奥运动。设计比赛入围奖。", descEN: "Merging Macau landmarks with winter sports visuals." },
+            { id: 18, tag: "Branding", img: "https://via.placeholder.com/800x400/000000/ffffff?text=Font", titleCN: "黑圆楷字体", titleEN: "Black Round Kai Font", descCN: "保留传统楷体特点，融合现代黑粗体风韵。方正字体大赛入围。", descEN: "Mixing traditional Kai with modern bold styles." },
         ];
 
-        // ==========================================
-        // 2. Canvas 极光背景 (色系调整为图中的 蓝-绿-青)
-        // ==========================================
-        const canvas = document.getElementById('canvas-bg');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.2; // 减慢速度，更优雅
-                this.vy = (Math.random() - 0.5) * 0.2;
-                this.size = Math.random() * 400 + 300; // 更大的光斑
-                // 复刻图片的色系：青色、绿色、深蓝、黑色(用于遮罩)
-                const colors = ['#06b6d4', '#10b981', '#1e40af', '#020617']; 
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < -this.size) this.x = width + this.size;
-                if (this.x > width + this.size) this.x = -this.size;
-                if (this.y < -this.size) this.y = height + this.size;
-                if (this.y > height + this.size) this.y = -this.size;
-            }
-            draw() {
-                ctx.beginPath();
-                // 径向渐变模拟柔光
-                const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-                g.addColorStop(0, this.color + '50'); // 30% 透明度
-                g.addColorStop(1, this.color + '00'); // 0% 透明度
-                ctx.fillStyle = g;
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < 5; i++) { particles.push(new Particle()); }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            // 使用 'screen' 混合模式让光叠加变亮，类似 PS
-            ctx.globalCompositeOperation = 'screen'; 
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        // ==========================================
-        // 3. 动态渲染 & 交互 (保持不变)
-        // ==========================================
+        // --- 2. 渲染项目卡片 (瀑布流) ---
         const grid = document.getElementById('projects-grid');
-        window.handleImgError = function(img, title) {
-            img.style.display = 'none';
-            const parent = img.parentNode;
-            parent.innerHTML = `<div class="fallback-placeholder"><i class="ph ph-image text-4xl mb-2"></i><span>${title}</span></div>`;
-        };
-
+        
         function renderProjects(filter = 'all') {
-            grid.innerHTML = '';
-            projectsData.forEach(p => {
-                if (filter === 'all' || p.category === filter) {
+            grid.innerHTML = ''; // 清空
+            projects.forEach(p => {
+                if (filter === 'all' || p.tag === filter || (filter === 'AI' && (p.tag === 'AI' || p.tag === 'New Media'))) {
                     const card = document.createElement('div');
-                    card.className = 'glass-card rounded-2xl group project-item';
+                    card.className = 'break-inside-avoid mb-8 group project-card rounded-2xl overflow-hidden cursor-pointer';
                     card.setAttribute('data-aos', 'fade-up');
-                    
-                    let colorClass = 'text-emerald-400 border-emerald-400/30';
-                    if(p.category === 'Branding') colorClass = 'text-cyan-400 border-cyan-400/30';
-                    if(p.category === 'Product') colorClass = 'text-blue-400 border-blue-400/30';
-                    
-                    const safeTitle = p.titleEN.replace(/'/g, "\\'");
+                    // 上图下文布局 (无变暗遮罩)
                     card.innerHTML = `
-                        <div class="img-container">
-                            <img src="${p.img}" onerror="handleImgError(this, '${safeTitle}')" alt="${p.titleEN}">
+                        <div class="card-img-box w-full overflow-hidden bg-slate-800">
+                            <!-- 🔴 请记得去 GitHub 上传对应文件名的图片，这里只有 2.png 是真的 -->
+                            <img src="${p.img}" alt="${p.titleEN}" class="w-full h-auto object-cover">
                         </div>
-                        <div class="p-6">
-                            <div class="mb-3 flex gap-2">
-                                <span class="text-xs ${colorClass} border px-2 py-1 rounded font-mono">${p.year}</span>
-                                <span class="text-xs text-gray-500 border border-gray-700 px-2 py-1 rounded bg-black/20">${p.category}</span>
+                        <div class="p-6 bg-[#0f172a]">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">${p.tag}</span>
                             </div>
-                            <h3 class="text-xl font-bold text-white mb-2">
+                            <h3 class="text-lg font-bold text-white mb-2">
                                 <span lang="cn">${p.titleCN}</span><span lang="en">${p.titleEN}</span>
                             </h3>
-                            <p class="text-gray-400 text-sm line-clamp-2">
+                            <p class="text-slate-400 text-sm leading-relaxed">
                                 <span lang="cn">${p.descCN}</span><span lang="en">${p.descEN}</span>
                             </p>
                         </div>
                     `;
-                    card.onclick = () => openModal(p.img, p.titleCN, p.titleEN, p.category + ' ' + p.year);
                     grid.appendChild(card);
                 }
             });
         }
+        // 初始渲染
         renderProjects();
 
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                renderProjects(btn.getAttribute('data-filter'));
+        // 筛选点击事件
+        const filters = document.getElementById('filters');
+        filters.addEventListener('click', (e) => {
+            if(e.target.tagName === 'BUTTON') {
+                // 切换 active 样式
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                // 重新渲染
+                renderProjects(e.target.getAttribute('data-filter'));
+            }
+        });
+
+        // --- 3. 基础交互脚本 (AOS, 语言, 顶部) ---
+        AOS.init({ once: true, offset: 100, easing: 'ease-out-cubic' });
+
+        function toggleLanguage() {
+            const body = document.body;
+            const btnText = document.getElementById('lang-btn-text');
+            body.classList.toggle('english-mode');
+            btnText.innerText = body.classList.contains('english-mode') ? 'CN' : 'EN';
+        }
+
+        const backToTopBtn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 4. [关键] 鼠标液态干扰逻辑 (Parallax Interference) ---
+        const blobs = document.querySelectorAll('.blob');
+        let mouseX = 0;
+        let mouseY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+            requestAnimationFrame(updateBlobs);
+        });
+
+        function updateBlobs() {
+            blobs.forEach((blob, index) => {
+                // 干扰系数
+                const speed = (index + 1) * 30; 
+                // 反向视差推开
+                const x = -mouseX * speed;
+                const y = -mouseY * speed;
+                // 应用变换
+                blob.style.transform = `translate(${x}px, ${y}px) scale(${1 + Math.abs(mouseX) * 0.1})`;
             });
-        });
-
-        const modal = document.getElementById('project-modal');
-        const modalContent = document.getElementById('modal-content');
-        const modalImg = document.getElementById('modal-img');
-        const modalTitle = document.getElementById('modal-title');
-        const modalDesc = document.getElementById('modal-desc');
-
-        function openModal(imgSrc, titleCN, titleEN, meta) {
-            modalImg.src = imgSrc;
-            modalTitle.innerHTML = `<span lang="cn">${titleCN}</span><span lang="en">${titleEN}</span>`;
-            modalDesc.textContent = meta;
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }, 10);
-            document.body.style.overflow = 'hidden';
         }
-
-        function closeModal() {
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modalImg.src = '';
-                document.body.style.overflow = 'auto';
-            }, 300);
-        }
-
-        const langBtn = document.getElementById('lang-btn');
-        const langText = document.getElementById('lang-text');
-        document.body.classList.add('cn-mode');
-        langBtn.addEventListener('click', () => {
-            document.body.classList.toggle('en-mode');
-            langText.textContent = document.body.classList.contains('en-mode') ? 'EN / CN' : 'CN / EN';
-        });
-
-        AOS.init({ once: true, offset: 50, duration: 800 });
     </script>
 </body>
 </html>
