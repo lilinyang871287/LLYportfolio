@@ -120,23 +120,37 @@
         }
         
         /* --- 8. 滚动条美化 --- */
-/* 滚动条整体 */
-::-webkit-scrollbar {
-    width: 10px;               /* 竖向滚动条宽度 */
-    height: 10px;              /* 横向滚动条高度 */
-}
+        /* 滚动条整体 */
+        ::-webkit-scrollbar {
+            width: 10px;               /* 竖向滚动条宽度 */
+            height: 10px;              /* 横向滚动条高度 */
+        }
+        
+        /* 滚动条轨道（背景）：设置为你的网页底色 #000509 */
+        ::-webkit-scrollbar-track {
+            background: #000509; 
+        }
+        
+        /* 滚动条滑块：设置为深灰色，带圆角 */
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;       /* 深灰 (Slate-800) */
+            border-radius: 5px;        /* 圆角 */
+            border: 2px solid #000509; /* 加上边框让滑块看起来有一点“悬浮感” */
+        }
 
-/* 滚动条轨道（背景）：设置为你的网页底色 #000509 */
-::-webkit-scrollbar-track {
-    background: #000509; 
-}
-
-/* 滚动条滑块：设置为深灰色，带圆角 */
-::-webkit-scrollbar-thumb {
-    background: #1e293b;       /* 深灰 (Slate-800) */
-    border-radius: 5px;        /* 圆角 */
-    border: 2px solid #000509; /* 加上边框让滑块看起来有一点“悬浮感” */
-}
+        /* --- 9. 图片加载骨架/占位符 --- */
+        /* 加载动画：通过改变透明度，模拟“呼吸”效果 */
+        @keyframes pulse-opacity {
+            0% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.5; }
+        }
+        .placeholder-loading {
+            /* 容器背景色设置得更亮一点，与动画配合 */
+            background-color: #1e293b; 
+            /* 启用脉冲动画 */
+            animation: pulse-opacity 1.5s infinite ease-in-out;
+        }
 
 /* 鼠标悬停在滑块上时：变亮一点 */
 ::-webkit-scrollbar-thumb:hover {
