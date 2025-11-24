@@ -141,6 +141,7 @@
 
     <svg width="0" height="0" style="position:absolute; overflow:hidden;">
         <filter id="frosted-glow" x="-50%" y="-50%" width="200%" height="200%">
+            
             <feMorphology operator="dilate" radius="8" in="SourceAlpha" result="thicken" />
             
             <feGaussianBlur stdDeviation="6" in="thicken" result="blurred" />
