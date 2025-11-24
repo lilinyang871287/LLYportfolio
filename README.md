@@ -1,7 +1,7 @@
 # Lilinyang Portfolio 2026
 
 ![Portfolio Preview](p1-111.png) 
-*(你可以稍后把这里换成一张你网页的截图)*
+*(网页截图)*
 
 > 🎨 一个基于 HTML5 Canvas 和 Tailwind CSS 构建的沉浸式个人作品集网站。
 > A immersive portfolio website built with HTML5 Canvas and Tailwind CSS.
