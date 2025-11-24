@@ -369,6 +369,13 @@
 
     <!-- 脚本区 --><script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
+
+        // 新增：图片加载成功后移除占位符类
+        window.removePlaceholder = function(imgElement) {
+            // 找到 img 的父容器 (div.img-container) 并移除占位符类
+            imgElement.parentNode.classList.remove('placeholder-loading');
+        };
+            
         // --- 0. 强制刷新回顶 (可选) ---
         if (history.scrollRestoration) { history.scrollRestoration = 'manual'; }
         
