@@ -271,9 +271,11 @@
         </div>
     </div>
 
-    <!-- 脚本区 -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- 脚本区 --><script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+        // --- 0. 强制刷新回顶 (可选) ---
+        if (history.scrollRestoration) { history.scrollRestoration = 'manual'; }
+        
         // ==========================================
         // 1. 项目数据 (保持不变)
         // ==========================================
@@ -299,64 +301,107 @@
         ];
 
         // ==========================================
-        // 2. Canvas 极光背景 (色系调整为图中的 蓝-绿-青)
+        // 2. Canvas 极光背景 (升级版：呼吸感 + 性能优化)
         // ==========================================
         const canvas = document.getElementById('canvas-bg');
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
+        let animationId; // 用于控制动画暂停
+
+        // 防抖 Resize
+        function debounce(func, wait) {
+            let timeout;
+            return function () {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
 
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
         }
-        window.addEventListener('resize', resize);
+        window.addEventListener('resize', debounce(resize, 200));
         resize();
 
         class Particle {
             constructor() {
+                this.reset();
+                this.y = Math.random() * height; // 初始随机位置
+            }
+
+            reset() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.2; // 减慢速度，更优雅
-                this.vy = (Math.random() - 0.5) * 0.2;
-                this.size = Math.random() * 400 + 300; // 更大的光斑
-                // 复刻图片的色系：青色、绿色、深蓝、黑色(用于遮罩)
+                // 🚀 速度调快：从 0.2 提升到 0.6，方向更随机
+                this.vx = (Math.random() - 0.5) * 0.6; 
+                this.vy = (Math.random() - 0.5) * 0.6;
+                this.baseSize = Math.random() * 300 + 300; // 基础大小
+                this.angle = Math.random() * Math.PI * 2; // 用于呼吸效果的相位
+                
                 const colors = ['#06b6d4', '#10b981', '#1e40af', '#020617']; 
                 this.color = colors[Math.floor(Math.random() * colors.length)];
             }
+
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                if (this.x < -this.size) this.x = width + this.size;
-                if (this.x > width + this.size) this.x = -this.size;
-                if (this.y < -this.size) this.y = height + this.size;
-                if (this.y > height + this.size) this.y = -this.size;
+                this.angle += 0.01; // 呼吸速度
+
+                // 🌬️ 呼吸感核心：利用正弦波改变大小
+                this.size = this.baseSize + Math.sin(this.angle) * 30; 
+
+                // 边界检查（无缝循环）
+                if (this.x < -this.size * 1.5) this.x = width + this.size;
+                if (this.x > width + this.size * 1.5) this.x = -this.size;
+                if (this.y < -this.size * 1.5) this.y = height + this.size;
+                if (this.y > height + this.size * 1.5) this.y = -this.size;
             }
+
             draw() {
                 ctx.beginPath();
-                // 径向渐变模拟柔光
                 const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-                g.addColorStop(0, this.color + '50'); // 30% 透明度
-                g.addColorStop(1, this.color + '00'); // 0% 透明度
+                g.addColorStop(0, this.color + '50'); 
+                g.addColorStop(1, this.color + '00'); 
                 ctx.fillStyle = g;
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
-        for (let i = 0; i < 5; i++) { particles.push(new Particle()); }
+        // 初始化粒子
+        for (let i = 0; i < 6; i++) { particles.push(new Particle()); }
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            // 使用 'screen' 混合模式让光叠加变亮，类似 PS
             ctx.globalCompositeOperation = 'screen'; 
             particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
+            animationId = requestAnimationFrame(animate);
         }
-        animate();
+        
+        // ⚡️ 性能优化核心：IntersectionObserver
+        // 当 Hero 区域离开屏幕时，停止 Canvas 动画
+        const heroSection = document.querySelector('section'); // 获取第一个 section (Hero)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // 进入视野：开始动画
+                    if (!animationId) animate();
+                } else {
+                    // 离开视野：取消动画帧，暂停计算
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            });
+        }, { threshold: 0 }); // 只要有一点点可见就开始，完全不可见就停止
+
+        observer.observe(heroSection);
 
         // ==========================================
-        // 3. 动态渲染 & 交互 (保持不变)
+        // 3. 动态渲染 & 交互
         // ==========================================
         const grid = document.getElementById('projects-grid');
         window.handleImgError = function(img, title) {
@@ -450,6 +495,23 @@
         });
 
         AOS.init({ once: true, offset: 50, duration: 800 });
+
+        // ==========================================
+        // 4. 回到顶部按钮逻辑
+        // ==========================================
+        const backToTopBtn = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-10');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     </script>
 </body>
 </html>
