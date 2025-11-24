@@ -61,11 +61,20 @@
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
         }
 
-        /* --- 5. 巨型标题发光特效 (复刻图片核心) --- */
+        /* --- 5. 巨型标题发光特效 (SVG 磨砂版) --- */
         .glow-text {
-            text-shadow: 
-                0 0 40px rgba(16, 185, 129, 0.3), /* 绿色光晕 */
-                0 0 80px rgba(6, 182, 212, 0.2);  /* 青色光晕 */
+            /* 日志-移除原来的 text-shadow，因为 SVG 滤镜接管了一切 */
+            text-shadow: none;
+            
+            /* 关键：应用我们在 HTML 里定义的滤镜 ID */
+            filter: url(#frosted-glow);
+            
+            /* 颜色保持纯白 */
+            color: #ffffff;
+            
+            /* 确保文字层级够高 */
+            position: relative; 
+            z-index: 10;
         }
 
         /* --- 6. 图片容器 --- */
@@ -129,6 +138,25 @@
         </style>
 </head>
 <body class="cn-mode selection:bg-emerald-500 selection:text-white">
+
+    <svg width="0" height="0" style="position:absolute; overflow:hidden;">
+        <filter id="frosted-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feMorphology operator="dilate" radius="12" in="SourceAlpha" result="thicken" />
+            
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise" />
+            
+            <feComposite operator="in" in="noise" in2="thicken" result="noisyShape" />
+            
+            <feFlood flood-color="#10b981" result="greenColor" /> <feComposite operator="in" in="greenColor" in2="noisyShape" result="coloredGrain" />
+            
+            <feGaussianBlur stdDeviation="1.5" in="coloredGrain" result="softGrain" />
+
+            <feMerge>
+                <feMergeNode in="softGrain" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+    </svg>
 
     <!-- 🌌 背景：更新为蓝绿极光色系 -->
     <canvas id="canvas-bg"></canvas>
