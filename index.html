@@ -507,7 +507,7 @@
                     const safeTitle = p.titleEN.replace(/'/g, "\\'");
                     card.innerHTML = `
                         <div class="img-container">
-                            <img src="${p.img}" onerror="handleImgError(this, '${safeTitle}')" alt="${p.titleEN}">
+                            <img src="${p.img}" onerror="handleImgError(this, '${safeTitle}')" alt="${p.titleEN}" loading="lazy">
                         </div>
                         <div class="p-6">
                             <div class="mb-3 flex gap-2">
