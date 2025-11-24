@@ -527,10 +527,16 @@
                     
                     const safeTitle = p.titleEN.replace(/'/g, "\\'");
                     card.innerHTML = `
-                        <div class="img-container">
-                            <img src="${p.img}" onerror="handleImgError(this, '${safeTitle}')" alt="${p.titleEN}" loading="lazy">
-                        </div>
-                        <div class="p-6">
+                            <div class="img-container placeholder-loading">
+                                <img 
+                                    src="${p.img}" 
+                                    onerror="handleImgError(this, '${safeTitle}')" 
+                                    onload="removePlaceholder(this)" // 加载成功时调用函数移除占位符
+                                    alt="${p.titleEN}" 
+                                    loading="lazy"
+                                >
+                            </div>
+                            <div class="p-6">
                             <div class="mb-3 flex gap-2">
                                 <span class="text-xs ${colorClass} border px-2 py-1 rounded font-mono">${p.year}</span>
                                 <span class="text-xs text-gray-500 border border-gray-700 px-2 py-1 rounded bg-black/20">${p.category}</span>
