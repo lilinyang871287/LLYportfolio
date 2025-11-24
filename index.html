@@ -157,13 +157,14 @@
             
             <feComposite operator="in" in="noise" in2="blurred" result="noisyGlow" />
             
-            <feFlood flood-color="#10b981" result="greenColor" />
+            <feFlood flood-color="#10b981" flood-opacity="0.6" result="greenColor" />
+            
             <feComposite operator="in" in="greenColor" in2="noisyGlow" result="coloredGrain" />
 
             <feGaussianBlur stdDeviation="0.5" in="coloredGrain" result="softGrain" />
             
             <feComponentTransfer in="softGrain" result="boostedGlow">
-                <feFuncA type="linear" slope="3" intercept="0" />
+                <feFuncA type="linear" slope="1.5" intercept="0" />
             </feComponentTransfer>
 
             <feMerge>
