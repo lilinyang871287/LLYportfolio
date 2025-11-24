@@ -141,18 +141,25 @@
 
     <svg width="0" height="0" style="position:absolute; overflow:hidden;">
         <filter id="frosted-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feMorphology operator="dilate" radius="12" in="SourceAlpha" result="thicken" />
+            <feMorphology operator="dilate" radius="8" in="SourceAlpha" result="thicken" />
             
-            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" result="noise" />
+            <feGaussianBlur stdDeviation="6" in="thicken" result="blurred" />
             
-            <feComposite operator="in" in="noise" in2="thicken" result="noisyShape" />
+            <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="3" result="noise" />
             
-            <feFlood flood-color="#10b981" result="greenColor" /> <feComposite operator="in" in="greenColor" in2="noisyShape" result="coloredGrain" />
+            <feComposite operator="in" in="noise" in2="blurred" result="noisyGlow" />
             
-            <feGaussianBlur stdDeviation="1.5" in="coloredGrain" result="softGrain" />
+            <feFlood flood-color="#10b981" result="greenColor" />
+            <feComposite operator="in" in="greenColor" in2="noisyGlow" result="coloredGrain" />
+
+            <feGaussianBlur stdDeviation="0.5" in="coloredGrain" result="softGrain" />
+            
+            <feComponentTransfer in="softGrain" result="boostedGlow">
+                <feFuncA type="linear" slope="3" intercept="0" />
+            </feComponentTransfer>
 
             <feMerge>
-                <feMergeNode in="softGrain" />
+                <feMergeNode in="boostedGlow" />
                 <feMergeNode in="SourceGraphic" />
             </feMerge>
         </filter>
