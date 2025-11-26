@@ -169,9 +169,12 @@
             mix-blend-mode: difference; /* 【核心魔法】反色模式！ */
             z-index: 9999; /* 保证在最上层 */
             transform: translate(-50%, -50%); /* 让鼠标指针在圆点中心 */
-            will-change: transform; /* 性能优化 */
-        }
-        
+            will-change: transform; /* 性能优化 *//* ...其他属性... */
+            will-change: transform; /* 👈 这一句必须有！ */
+            /* 还可以加上这一句，强制开启 3D 加速 */
+            transform: translate3d(-50%, -50%, 0); 
+            }
+                
         </style>
 </head>
 <body class="cn-mode selection:bg-emerald-500 selection:text-white">
