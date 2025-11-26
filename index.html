@@ -169,7 +169,6 @@
             mix-blend-mode: difference; /* 【核心魔法】反色模式！ */
             z-index: 9999; /* 保证在最上层 */
             transform: translate(-50%, -50%); /* 让鼠标指针在圆点中心 */
-            transition: transform 0.1s ease-out; /* 让跟随稍微有点延迟感，更顺滑 */
             will-change: transform; /* 性能优化 */
         }
         
@@ -672,8 +671,8 @@
 
         // 动画帧循环
         function animateFollower() {
-            followerX += (mouseX - followerX) * 0.15;
-            followerY += (mouseY - followerY) * 0.15;
+            followerX += (mouseX - followerX) * 0.3;
+            followerY += (mouseY - followerY) * 0.3;
             
             follower.style.transform = `translate(${followerX}px, ${followerY}px) translate(-50%, -50%)`;
             
