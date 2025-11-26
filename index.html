@@ -156,6 +156,23 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #475569;       /* 亮灰 (Slate-600) */
 }
+            /* --- 10. 鼠标跟随反色圆点 --- */
+        #cursor-follower {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 24px;  /* 圆点大小，可以自己改 */
+            height: 24px;
+            background-color: white; /* 圆点本身是白色的 */
+            border-radius: 50%; /* 变成圆形 */
+            pointer-events: none; /* 让鼠标事件穿透它，不影响点击 */
+            mix-blend-mode: difference; /* 【核心魔法】反色模式！ */
+            z-index: 9999; /* 保证在最上层 */
+            transform: translate(-50%, -50%); /* 让鼠标指针在圆点中心 */
+            transition: transform 0.1s ease-out; /* 让跟随稍微有点延迟感，更顺滑 */
+            will-change: transform; /* 性能优化 */
+        }
+        
         </style>
 </head>
 <body class="cn-mode selection:bg-emerald-500 selection:text-white">
@@ -190,6 +207,7 @@
 
     <!-- 🌌 背景：更新为蓝绿极光色系 -->
     <canvas id="canvas-bg"></canvas>
+    <div id="cursor-follower"></div>
 
     <!-- 导航栏 (保留原样) -->
     <nav class="fixed w-full z-50 glass-nav transition-all duration-300">
